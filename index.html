@@ -99,8 +99,11 @@
             <!-- ÉCRAN 2: HEURE DU REPAS -->
             <div id="screen-meal-time" class="screen">
                 <div class="wizard-card">
-                    <h2 class="wizard-title">🗓️ À quelle heure souhaitez-vous manger ?</h2>
-                    <input type="time" id="mealTimeInput" class="border p-3 text-2xl w-full rounded-lg text-center">
+                    <h2 class="wizard-title">🗓️ À quelle date et heure souhaitez-vous manger ?</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="date" id="mealDateInput" class="border p-3 text-xl w-full rounded-lg text-center">
+                        <input type="time" id="mealTimeInput" class="border p-3 text-2xl w-full rounded-lg text-center">
+                    </div>
                     <div class="flex justify-between mt-6">
                         <button onclick="goBack()" class="nav-button">Retour</button>
                         <button onclick="setMealTime()" class="action-button bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Suivant</button>
@@ -121,6 +124,24 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ÉCRAN X: TYPE DE BARBECUE -->
+            <div id="screen-bbq-type" class="screen">
+                <div class="wizard-card">
+                    <h2 class="wizard-title">🥩 Quel équipement utilisez-vous ?</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                        <button onclick="setBbqType('kettle')" class="action-button bg-gray-800 text-white py-4 px-3 rounded-lg">Kettle / Charbon</button>
+                        <button onclick="setBbqType('gaz')" class="action-button bg-blue-600 text-white py-4 px-3 rounded-lg">Gaz</button>
+                        <button onclick="setBbqType('pellet')" class="action-button bg-green-600 text-white py-4 px-3 rounded-lg">Pellet</button>
+                        <button onclick="setBbqType('plancha')" class="action-button bg-yellow-600 text-white py-4 px-3 rounded-lg">Plancha</button>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-3">Ce choix adaptera les recommandations de combustible, fumage et accessoires.</p>
+                    <div class="flex justify-between mt-6">
+                        <button onclick="goBack()" class="nav-button">Retour</button>
+                    </div>
+                </div>
+            </div>
+
             
             <!-- ÉCRAN 4: MODE DE CUISSON -->
             <div id="screen-cooking-mode" class="screen">
@@ -158,12 +179,39 @@
             <!-- ÉCRAN 6: PRÉPARATION -->
             <div id="screen-preparation" class="screen">
                 <div class="wizard-card">
-                    <h2 class="wizard-title">🧂 Choix de la Préparation</h2>
+                    <h2 class="wizard-title">🧂 Choix de la Préparation & Cuisson</h2>
                     <div id="preparation-options-container" class="space-y-4"></div>
-                     <p class="text-sm text-gray-600 mt-2">L'application adaptera les instructions de cuisson en fonction de votre choix.</p>
                      <div class="flex justify-between mt-6">
                         <button onclick="goBack()" class="nav-button">Retour</button>
                         <button onclick="setPreparation()" class="action-button bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Suivant</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ÉCRAN 6.5: ACCESSOIRES -->
+            <div id="screen-accessories" class="screen">
+                <div class="wizard-card">
+                    <h2 class="wizard-title">🔧 Quels accessoires utilisez-vous ?</h2>
+                    <div id="accessories-options-container" class="space-y-4"></div>
+                     <p class="text-sm text-gray-600 mt-2">Le choix d'un accessoire adaptera les étapes de la cuisson.</p>
+                     <div class="flex justify-between mt-6">
+                        <button onclick="goBack()" class="nav-button">Retour</button>
+                        <button onclick="setAccessories()" class="action-button bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Suivant</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÉCRAN 6.8: PRE-PREP -->
+            <div id="screen-pre-prep" class="screen">
+                <div class="wizard-card">
+                    <h2 class="wizard-title">Préparations à faire maintenant</h2>
+                    <p class="text-gray-600 mb-4">Avant d'allumer le feu, il est conseillé de préparer les éléments suivants :</p>
+                    <div id="pre-prep-list" class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                        <!-- Items will be populated by JS -->
+                    </div>
+                    <div class="flex justify-between mt-6">
+                        <button onclick="goBack()" class="nav-button">Retour</button>
+                        <button onclick="confirmPrePrep()" class="action-button bg-red-600 text-white font-bold py-2 px-6 rounded-lg">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -196,9 +244,12 @@
                     <h2 class="wizard-title">📋 Votre Plan de Cuisson</h2>
                     <div id="weather-alert" class="hidden my-4 p-4 rounded-lg"></div>
                     <div id="summary-content" class="space-y-4"></div>
-                    <div class="flex justify-between mt-6">
+                    <div class="flex justify-between items-center mt-6">
                         <button onclick="goBack()" class="nav-button">Retour</button>
-                        <button onclick="startCooking()" class="action-button bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg">Démarrer la Cuisson !</button>
+                        <div class="flex gap-4">
+                             <button onclick="generateCalendarEvent()" id="calendar-btn" class="action-button bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg hidden">Ajouter au calendrier</button>
+                            <button onclick="startCooking()" class="action-button bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg">Démarrer la Cuisson !</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +309,7 @@
         <!-- Boutons flottants -->
         <div class="fixed top-4 left-4 z-[101] flex flex-col gap-2">
             <button id="saucesToggle" onclick="togglePanel('saucesPanel')" class="action-button bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full shadow-lg" aria-label="Sauces et Marinades">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.1 8a5.87 5.87 0 0 1 7.17 3.01A6 6 0 0 1 10 18a6 6 0 0 1-6-6c0-1.74.78-3.32 2-4.42Z"/><path d="m14 4 1-1 1 1"/><path d="M12 22a2 2 0 0 0 2-2v-2H10v2a2 2 0 0 0 2 2Z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M8 6h.01"/></svg>
             </button>
             <button id="notebookToggle" onclick="togglePanel('notebookPanel')" class="action-button bg-blue-600 text-white p-3 rounded-full shadow-lg" aria-label="Mon Carnet">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 12h4"/><path d="M2 18h4"/><path d="M6 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2z"/></svg>
@@ -337,9 +388,15 @@
                     <h3 id="recipeModalTitle" class="text-xl font-bold text-gray-800">Recettes</h3>
                     <button onclick="closeRecipeModal()" class="text-gray-500 hover:text-gray-800">&times;</button>
                 </div>
-                 <div id="recipePreference" class="mb-4">
-                    <label for="recipePreferenceInput" class="block text-sm font-medium text-gray-700">Ajouter une préférence ? (facultatif)</label>
-                    <input type="text" id="recipePreferenceInput" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" placeholder="Ex: avec du chèvre, plus épicé...">
+                 <div class="grid grid-cols-2 gap-4 mb-4">
+                     <div>
+                        <label for="recipePreferenceInput" class="block text-sm font-medium text-gray-700">Ajouter une préférence ? (facultatif)</label>
+                        <input type="text" id="recipePreferenceInput" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 sm:text-sm" placeholder="Ex: avec du chèvre, plus épicé...">
+                     </div>
+                     <div>
+                        <label for="recipeAllergyInput" class="block text-sm font-medium text-gray-700">Allergies à éviter ? (facultatif)</label>
+                        <input type="text" id="recipeAllergyInput" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 sm:text-sm" placeholder="Ex: arachides, gluten...">
+                     </div>
                 </div>
                 <div id="recipeModalContent" class="prose max-w-none max-h-[60vh] overflow-y-auto pr-4"></div>
                 <div id="recipeModalActions" class="mt-4 pt-4 border-t flex justify-between items-center gap-3"></div>
@@ -360,11 +417,11 @@
     const ACCESS_CODE = "bbq";
 
     const fuelDB = {
+        bbqTypes: ['kettle', 'gaz', 'pellet', 'plancha'],
+        smokeForms: ['chunks', 'copeaux', 'sciure', 'plank', 'aucun'],
         general: {
-            fuelTypes: ["Briquettes de charbon", "Charbon en morceaux"],
-            woodTypes: ["Hickory", "Chêne", "Mesquite", "Pommier", "Cerisier", "Érable", "Aulne", "Hêtre", "Cèdre", "Aucun"]
-        },
-        recommendations: {
+            fuelTypes: ['Charbon en morceaux', 'Briquettes de charbon', 'Gaz (propane/ butane)', 'Pellet (granulés)'],
+            woodTypes: ['Aucun', 'Hickory', 'Pommier', 'Cerisier', 'Aulne'],
             boeuf: { fuel: "Briquettes de charbon", wood: "Hickory", notes: "Idéal pour une fumée corcée et une chaleur stable sur la durée." },
             porc: { fuel: "Briquettes de charbon", wood: "Pommier", notes: "Apporte une fumée douce et sucrée qui complète parfaitement le porc." },
             volaille: { fuel: "Charbon en morceaux", wood: "Cerisier", notes: "Fournit une chaleur réactive et une fumée légère et fruitée." },
@@ -379,47 +436,46 @@
     const foodDB = {
         "Recettes Personnalisées": {},
         "Plats & Sandwichs": {
-            pizza: { name: "Pizza", type: 'default', duration: 480, targetTempBBQ: 280, targetTempInternal: 90, methods: [{ type: "grill", steps: [{ name: "Cuisson Pizza", zone: "Indirecte", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Préchauffer une pierre à pizza en zone indirecte 20min. Glisser la pizza et cuire 6-8 minutes." }] }], rest: { duration: 120 } },
+            pizza: { name: "Pizza", type: 'default', accessories: [{id: 'pizza_stone', name: 'Pierre à Pizza'}], requires_accessory: 'pizza_stone', duration: 480, targetTempBBQ: 280, targetTempInternal: 90, methods: [{ type: "grill", steps: [{ name: "Cuisson Pizza", zone: "Indirecte", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Préchauffer une pierre à pizza en zone indirecte 20min. Glisser la pizza et cuire 6-8 minutes." }] }], rest: { duration: 120 } },
             burger: { name: "Burger Classique", type: 'boeuf', rub_friendly: true, duration: 480, targetTempBBQ: 190, targetTempInternal: 70, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe / Indirecte", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Griller 4 min par face. Ajouter le fromage la dernière minute et toaster les pains en indirect.", flippable: true }] }], rest: { duration: 0 } },
             smash_burger: { name: "Smash Burger", type: 'boeuf', rub_friendly: true, duration: 240, targetTempBBQ: 250, targetTempInternal: 75, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe (Plancha)", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Sur une plancha chaude, écraser la boule de viande et cuire 2 min par face.", flippable: true }] }], rest: { duration: 0 } },
             croque_monsieur: { name: "Croque-monsieur", type: 'porc', duration: 600, targetTempBBQ: 180, targetTempInternal: 80, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte / Directe", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Placer en zone indirecte pour faire fondre le fromage, puis dorer 1 min en direct sur chaque face.", flippable: true }] }], rest: { duration: 0 } }
         },
         "Bœuf / Veau": {
-            brisket: { name: "Poitrine de Bœuf (Brisket)", type: 'boeuf', rub_friendly: true, requiresWeight: true, targetTempBBQ: 115, targetTempInternal: 95, timePerKgSeconds: 12600, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer jusqu'à atteindre la T° interne cible. Envelopper dans du papier boucher vers 75-80°C." }] }], rest: { duration: 7200, action: "Reposer dans une glacière (sans glace) pendant au moins 2 heures." } },
-            pastrami: { name: "Pastrami (Brisket)", type: 'boeuf', rub_friendly: true, requiresWeight: true, targetTempBBQ: 120, targetTempInternal: 95, timePerKgSeconds: 7200, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Après saumurage et dessalage, fumer pendant 6-8h jusqu'à atteindre la température à coeur." }] }], rest: { duration: 7200, action: "Laisser refroidir complètement, idéalement une nuit au frigo." } },
-            steak_2_5cm: { name: "Steak / Côte de bœuf (~2.5cm)", type: 'boeuf', rub_friendly: true, duration: 660, targetTempBBQ: 210, targetTempInternal: 54, methods: [{ type: "grill", steps: [{ name: "Saisie", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 3-4 min par face en direct, puis finir en indirect si nécessaire.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
-            bifteck_4cm: { name: "Bifteck (~4cm)", type: 'boeuf', rub_friendly: true, duration: 900, targetTempBBQ: 200, targetTempInternal: 54, methods: [{ type: "grill", steps: [{ name: "Saisie", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 7-8 min par face en direct.", flippable: true }] }], rest: { duration: 300 } },
-            short_ribs: { name: "Short Ribs de boeuf", type: 'boeuf', rub_friendly: true, duration: 21600, targetTempBBQ: 125, targetTempInternal: 96, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 5-6 heures, en vaporisant de temps en temps. Envelopper si le 'stall' est trop long." }] }], rest: { duration: 3600, action: "Reposer au moins 1 heure dans une glacière." } },
-            tomahawk: { name: "Steak Tomahawk", type: 'boeuf', rub_friendly: true, duration: 3600, targetTempBBQ: 120, targetTempInternal: 54, methods: [{ type: "grill", steps: [{ name: "Cuisson indirecte", duration: 3000, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 50%", action: "Cuire en indirect jusqu'à 48°C à coeur (saisie inversée)." }, { name: "Saisie", duration: 600, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 2-3 minutes par face sur braises vives." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
-            tri_tip: { name: "Tri-Tip (Pointe de surlonge)", type: 'boeuf', rub_friendly: true, duration: 2700, targetTempBBQ: 135, targetTempInternal: 56, methods: [{ type: "grill", steps: [{ name: "Cuisson indirecte", duration: 2100, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en indirect jusqu'à 50°C à coeur." }, { name: "Saisie", duration: 600, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir rapidement sur toutes les faces." }] }], rest: { duration: 900, action: "Laisser reposer 15 minutes avant de trancher contre le grain." } },
-            bavette: { name: "Bavette d'aloyau", type: 'boeuf', rub_friendly: true, duration: 360, targetTempBBQ: 230, targetTempInternal: 52, methods: [{ type: "grill", steps: [{ name: "Saisie rapide", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 2-3 minutes par face pour une cuisson saignante.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
+            brisket: { name: "Poitrine de Bœuf (Brisket)", type: 'boeuf', recommended_preparations: ['rub'], recommended_preparation_reason: "Le rub forme une croûte savoureuse (le 'bark') essentielle à un bon brisket.", spritz: { interval: 3600, liquid: "mélange 50/50 de vinaigre de cidre et d'eau" }, requiresWeight: true, targetTempBBQ: 115, targetTempInternal: 95, timePerKgSeconds: 12600, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer jusqu'à atteindre la T° interne cible. Envelopper dans du papier boucher vers 75-80°C." }] }], rest: { duration: 7200, action: "Reposer dans une glacière (sans glace) pendant au moins 2 heures." } },
+            pastrami: { name: "Pastrami (Brisket)", type: 'boeuf', recommended_preparations: ['brine'], recommended_preparation_reason: "Le saumurage est l'étape clé pour transformer la poitrine de bœuf en pastrami.", requiresWeight: true, targetTempBBQ: 120, targetTempInternal: 95, timePerKgSeconds: 7200, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Après saumurage et dessalage, fumer pendant 6-8h jusqu'à atteindre la température à coeur." }] }], rest: { duration: 7200, action: "Laisser refroidir complètement, idéalement une nuit au frigo." } },
+            steak: { name: "Steak / Côte de bœuf", type: 'boeuf', recommended_preparations: ['rub'], recommended_preparation_reason: "Un rub sec pénètre la viande rapidement et crée une belle croûte à la saisie.", requiresThickness: true, timePerCmSeconds: 180, doneness_options: { 'bleu': 50, 'saignant': 54, 'a_point': 60 }, targetTempInternal: 54, targetTempBBQ: 210, methods: [{ type: "grill", steps: [{ name: "Saisie", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir en retournant à mi-cuisson, puis finir en indirect si nécessaire.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
+            short_ribs: { name: "Short Ribs de boeuf", type: 'boeuf', recommended_preparations: ['rub'], spritz: { interval: 3600, liquid: "bière brune ou bouillon de boeuf" }, recommended_preparation_reason: "Le rub va caraméliser lentement durant la longue cuisson et créer une croûte délicieuse.", duration: 21600, targetTempBBQ: 125, targetTempInternal: 96, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 5-6 heures. Envelopper si le 'stall' est trop long." }] }], rest: { duration: 3600, action: "Reposer au moins 1 heure dans une glacière." } },
+            tomahawk: { name: "Steak Tomahawk", type: 'boeuf', recommended_preparations: ['rub'], recommended_preparation_reason: "Un rub simple (sel, poivre, ail) suffit pour sublimer cette pièce de viande exceptionnelle.", doneness_options: { 'bleu': 48, 'saignant': 52, 'a_point': 58 }, targetTempInternal: 52, duration: 3600, targetTempBBQ: 120, methods: [{ type: "grill", steps: [{ name: "Cuisson indirecte", duration: 3000, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 50%", action: "Cuire en indirect jusqu'à la T° cible de cuisson (saisie inversée)." }, { name: "Saisie", duration: 600, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 2-3 minutes par face sur braises vives." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
+            tri_tip: { name: "Tri-Tip (Pointe de surlonge)", type: 'boeuf', recommended_preparations: ['rub'], duration: 2700, targetTempBBQ: 135, targetTempInternal: 56, methods: [{ type: "grill", steps: [{ name: "Cuisson indirecte", duration: 2100, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en indirect jusqu'à 50°C à coeur." }, { name: "Saisie", duration: 600, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir rapidement sur toutes les faces." }] }], rest: { duration: 900, action: "Laisser reposer 15 minutes avant de trancher contre le grain." } },
+            bavette: { name: "Bavette d'aloyau", type: 'boeuf', recommended_preparations: ['marinade'], recommended_preparation_reason: "Une marinade attendrit cette coupe de viande et lui apporte beaucoup de saveur.", duration: 360, targetTempBBQ: 230, targetTempInternal: 52, methods: [{ type: "grill", steps: [{ name: "Saisie rapide", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir 2-3 minutes par face pour une cuisson saignante.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
         },
         "Porc": {
-            pulled_pork: { name: "Épaule de porc (Pulled Pork)", type: 'porc', rub_friendly: true, requiresWeight: true, targetTempBBQ: 115, targetTempInternal: 95, timePerKgSeconds: 7200, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 8-10 heures. Emballer lorsque la T° interne atteint 75°C. Poursuivre jusqu'à 95°C." }] }], rest: { duration: 3600, action: "Laisser reposer dans une glacière pendant au moins 1 heure avant d'effilocher." } },
-            pork_belly_burnt_ends: { name: "Pork Belly Burnt Ends", type: 'porc', rub_friendly: true, duration: 14400, targetTempBBQ: 125, targetTempInternal: 90, methods: [{ type: "smoke", steps: [{ name: "Fumage", duration: 10800, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Couper la poitrine en cubes, appliquer le rub et fumer 3h." }, { name: "Braising", duration: 3600, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Mettre les cubes dans une barquette alu avec beurre, cassonade, miel et couvrir. Cuire 1h à 1h30." }] }], rest: { duration: 600, action: "Laisser la sauce épaissir à découvert 10-15 min." } },
-            pork_belly: { name: "Poitrine de porc entière", type: 'porc', rub_friendly: true, duration: 18000, targetTempBBQ: 110, targetTempInternal: 95, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 4-5 heures jusqu'à ce que la viande soit tendre." }] }], rest: { duration: 1800, action: "Laisser reposer 30 minutes avant de trancher." } },
-            travers_porc_st_louis: { name: "Travers de porc (St. Louis)", type: 'porc', rub_friendly: true, duration: 18000, targetTempBBQ: 125, targetTempInternal: 92, methods: [{ type: "smoke", steps: [{ name: "Fumage (3h)", duration: 10800, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer 3h, en vaporisant toutes les heures." }, { name: "Emballage (2h)", duration: 7200, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Emballer dans du papier aluminium avec un liquide (jus de pomme) et cuire 2h." }, { name: "Sauce (1h)", duration: 3600, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Déballer, appliquer la sauce et laisser caraméliser 1h." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
-            filet_mignon_porc: { name: "Filet Mignon (Saisie Inversée)", type: 'porc', rub_friendly: true, duration: 2400, targetTempBBQ: 155, targetTempInternal: 63, methods: [ { type: "grill", steps: [ { name: "Cuisson Indirecte", duration: 2100, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en zone indirecte jusqu'à 58°C à coeur." }, { name: "Saisie Directe", duration: 300, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir rapidement de chaque côté.", flippable: true } ]}], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
-            cotelette_porc: { name: "Côtelette de porc (~3cm)", type: 'porc', rub_friendly: true, duration: 660, targetTempBBQ: 180, targetTempInternal: 65, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Griller 5-6 minutes de chaque côté.", flippable: true }] }], rest: { duration: 300 } },
+            pulled_pork: { name: "Épaule de porc (Pulled Pork)", type: 'porc', recommended_preparations: ['rub', 'injection'], spritz: { interval: 3600, liquid: "jus de pomme" }, recommended_preparation_reason: "Le rub est fondamental pour la croûte externe ('bark') et l'injection garantit une viande juteuse à cœur.", requiresWeight: true, targetTempBBQ: 115, targetTempInternal: 95, timePerKgSeconds: 7200, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Haute (Pos 3)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 8-10 heures. Emballer lorsque la T° interne atteint 75°C. Poursuivre jusqu'à 95°C." }] }], rest: { duration: 3600, action: "Laisser reposer dans une glacière pendant au moins 1 heure avant d'effilocher." } },
+            pork_belly_burnt_ends: { name: "Pork Belly Burnt Ends", type: 'porc', recommended_preparations: ['rub'], duration: 14400, targetTempBBQ: 125, targetTempInternal: 90, methods: [{ type: "smoke", steps: [{ name: "Fumage", duration: 10800, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Couper la poitrine en cubes, appliquer le rub et fumer 3h." }, { name: "Braising", duration: 3600, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Mettre les cubes dans une barquette alu avec beurre, cassonade, miel et couvrir. Cuire 1h à 1h30." }] }], rest: { duration: 600, action: "Laisser la sauce épaissir à découvert 10-15 min." } },
+            pork_belly: { name: "Poitrine de porc entière", type: 'porc', recommended_preparations: ['rub'], duration: 18000, targetTempBBQ: 110, targetTempInternal: 95, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 4-5 heures jusqu'à ce que la viande soit tendre." }] }], rest: { duration: 1800, action: "Laisser reposer 30 minutes avant de trancher." } },
+            travers_porc_st_louis: { name: "Travers de porc (St. Louis)", type: 'porc', recommended_preparations: ['rub', 'laquage'], spritz: { interval: 3600, liquid: "jus de pomme" }, duration: 18000, targetTempBBQ: 125, targetTempInternal: 92, methods: [{ type: "smoke", steps: [{ name: "Fumage (3h)", duration: 10800, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 3 heures." }, { name: "Emballage (2h)", duration: 7200, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Emballer dans du papier aluminium avec un liquide (jus de pomme) et cuire 2h." }, { name: "Sauce (1h)", duration: 3600, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Déballer, appliquer la sauce et laisser caraméliser 1h." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
+            filet_mignon_porc: { name: "Filet Mignon (Saisie Inversée)", type: 'porc', recommended_preparations: ['rub'], duration: 2400, targetTempBBQ: 155, targetTempInternal: 63, methods: [ { type: "grill", steps: [ { name: "Cuisson Indirecte", duration: 2100, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en zone indirecte jusqu'à 58°C à coeur." }, { name: "Saisie Directe", duration: 300, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Saisir rapidement de chaque côté.", flippable: true } ]}], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
+            cotelette_porc: { name: "Côtelette de porc", type: 'porc', requiresThickness: true, timePerCmSeconds: 220, allowed_preparations: ['none', 'marinade', 'brine'], recommended_preparations: ['marinade'], recommended_preparation_reason: "Une marinade ou une saumure garantit une côtelette juteuse et savoureuse.", targetTempBBQ: 180, targetTempInternal: 65, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Griller en retournant à mi-cuisson.", flippable: true }] }], rest: { duration: 300 } },
             saucisses_crues: { name: "Saucisses crues (2-zones)", type: 'porc', duration: 1080, targetTempBBQ: 160, targetTempInternal: 72, methods: [{ type: "grill", steps: [
                 { name: "Cuisson à coeur", duration: 840, zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en zone indirecte pour une cuisson à coeur, en retournant à mi-cuisson.", flippable: true }, 
                 { name: "Saisie Directe", duration: 240, zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 100%", action: "Terminer par une saisie rapide de tous les côtés pour bien griller." }
             ] }], rest: { duration: 0 } },
         },
          "Volaille": {
-            poulet_entier: { name: "Poulet entier (~1.2kg)", type: 'volaille', rub_friendly: true, duration: 3300, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en indirect jusqu'à atteindre la température à coeur dans la cuisse." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes sous aluminium." } },
-            applewood_chicken: { name: "Poulet fumé à la pomme", type: 'volaille', rub_friendly: true, duration: 7200, targetTempBBQ: 125, targetTempInternal: 75, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer 2h à 2h30 jusqu'à atteindre la température cible. Appliquer la sauce 20 min avant la fin." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
-            beer_can_chicken: { name: "Beer Can Chicken", type: 'volaille', rub_friendly: true, duration: 4500, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson Verticale", zone: "Indirecte", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire 'assis' sur une canette de bière à moitié pleine, en cuisson indirecte." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes avant de découper." } },
-            spatchcock_chicken: { name: "Poulet en Crapaudine", type: 'volaille', rub_friendly: true, duration: 2700, targetTempBBQ: 200, targetTempInternal: 75, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire côté peau vers le haut en indirect. Placer des briques sur le poulet pour une peau extra-croustillante." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
-            blanc_poulet_desosse: { name: "Blanc de poulet désossé", type: 'volaille', rub_friendly: true, duration: 1050, targetTempBBQ: 160, targetTempInternal: 74, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en zone indirecte en retournant à mi-cuisson.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
-            cuisse_poulet: { name: "Cuisse de poulet", type: 'volaille', rub_friendly: true, duration: 1800, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en zone indirecte en retournant à mi-cuisson.", flippable: true }] }], rest: { duration: 300 } },
-            aile_poulet: { name: "Aile de poulet", type: 'volaille', rub_friendly: true, duration: 1050, targetTempBBQ: 180, targetTempInternal: 80, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en indirect, retourner à mi-cuisson.", flippable: true }] }], rest: { duration: 180 } },
-            magret_canard: { name: "Magret de canard", type: 'volaille', rub_friendly: true, duration: 750, targetTempBBQ: 190, targetTempInternal: 57, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte / Directe", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Commencer côté peau en indirect pour faire fondre le gras, puis saisir rapidement côté chair." }] }], rest: { duration: 300 } },
+            poulet_entier: { name: "Poulet entier (~1.2kg)", type: 'volaille', recommended_preparations: ['rub', 'brine'], recommended_preparation_reason: "Le saumurage assure un poulet incroyablement juteux, et le rub une peau savoureuse et croustillante.", accessories: [{id: 'none', name: 'Sur la grille'}, {id: 'rotisserie', name: 'Rôtissoire'}], recommended_accessory: 'rotisserie', duration: 3300, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en indirect jusqu'à atteindre la température à coeur dans la cuisse." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes sous aluminium." } },
+            applewood_chicken: { name: "Poulet fumé à la pomme", type: 'volaille', recommended_preparations: ['rub'], duration: 7200, targetTempBBQ: 125, targetTempInternal: 75, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer 2h à 2h30 jusqu'à atteindre la température cible. Appliquer la sauce 20 min avant la fin." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
+            beer_can_chicken: { name: "Beer Can Chicken", type: 'volaille', recommended_preparations: ['rub'], accessories: [{id: 'beer_can_holder', name: 'Support pour poulet'}, {id: 'beer_can_only', name: 'Canette seule'}], recommended_accessory: 'beer_can_holder', duration: 4500, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson Verticale", zone: "Indirecte", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire 'assis' sur une canette de bière à moitié pleine, en cuisson indirecte." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes avant de découper." } },
+            spatchcock_chicken: { name: "Poulet en Crapaudine", type: 'volaille', recommended_preparations: ['rub'], duration: 2700, targetTempBBQ: 200, targetTempInternal: 75, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire côté peau vers le haut en indirect. Placer des briques sur le poulet pour une peau extra-croustillante." }] }], rest: { duration: 600, action: "Laisser reposer 10 minutes." } },
+            blanc_poulet_desosse: { name: "Blanc de poulet désossé", type: 'volaille', recommended_preparations: ['marinade'], duration: 1050, targetTempBBQ: 160, targetTempInternal: 74, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en zone indirecte en retournant à mi-cuisson.", flippable: true }] }], rest: { duration: 300, action: "Laisser reposer 5 minutes." } },
+            cuisse_poulet: { name: "Cuisse de poulet", type: 'volaille', recommended_preparations: ['rub'], duration: 1800, targetTempBBQ: 180, targetTempInternal: 82, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en zone indirecte en retournant à mi-cuisson.", flippable: true }] }], rest: { duration: 300 } },
+            aile_poulet: { name: "Aile de poulet", type: 'volaille', recommended_preparations: ['rub'], duration: 1050, targetTempBBQ: 180, targetTempInternal: 80, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Cuire en indirect, retourner à mi-cuisson.", flippable: true }] }], rest: { duration: 180 } },
+            magret_canard: { name: "Magret de canard", type: 'volaille', recommended_preparations: ['none'], duration: 750, targetTempBBQ: 190, targetTempInternal: 57, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte / Directe", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Commencer côté peau en indirect pour faire fondre le gras, puis saisir rapidement côté chair." }] }], rest: { duration: 300 } },
         },
         "Agneau": {
-              cotelette_agneau: { name: "Côtelette d'agneau", type: 'agneau', rub_friendly: true, duration: 660, targetTempBBQ: 180, targetTempInternal: 60, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Griller 4-6 minutes par face pour une cuisson rosée.", flippable: true }] }], rest: { duration: 300 } },
-              gigot_agneau: { name: "Gigot d'agneau rôti", type: 'agneau', rub_friendly: true, requiresWeight: true, timePerKgSeconds: 3600, targetTempBBQ: 150, targetTempInternal: 58, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en indirect jusqu'à la température désirée. Saisir à la fin si nécessaire." }] }], rest: { duration: 900 } },
-              lamb_shoulder: { name: "Épaule d'agneau confite", type: 'agneau', rub_friendly: true, requiresWeight: true, timePerKgSeconds: 7200, targetTempBBQ: 130, targetTempInternal: 95, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 6-8 heures jusqu'à ce que la viande s'effiloche facilement." }] }], rest: { duration: 1800, action: "Laisser reposer 30 minutes avant d'effilocher." } },
+              cotelette_agneau: { name: "Côtelette d'agneau", type: 'agneau', requiresThickness: true, timePerCmSeconds: 240, allowed_preparations: ['none', 'marinade'], recommended_preparations: ['marinade'], recommended_preparation_reason: "Une marinade à base d'ail, de romarin et d'huile d'olive est un classique qui sublime l'agneau.", doneness_options: { 'bleu': 52, 'saignant': 57, 'a_point': 63 }, targetTempInternal: 57, targetTempBBQ: 180, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe", grille: "Basse (Pos 1)", vents: "Bas: Pos 3 / Haut: 75%", action: "Griller en retournant à mi-cuisson pour une cuisson rosée.", flippable: true }] }], rest: { duration: 300 } },
+              gigot_agneau: { name: "Gigot d'agneau rôti", type: 'agneau', recommended_preparations: ['rub'], requiresWeight: true, timePerKgSeconds: 3600, targetTempBBQ: 150, targetTempInternal: 58, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 2 / Haut: 50%", action: "Cuire en indirect jusqu'à la température désirée. Saisir à la fin si nécessaire." }] }], rest: { duration: 900 } },
+              lamb_shoulder: { name: "Épaule d'agneau confite", type: 'agneau', recommended_preparations: ['rub'], requiresWeight: true, timePerKgSeconds: 7200, targetTempBBQ: 130, targetTempInternal: 95, methods: [{ type: "smoke", steps: [{ name: "Fumage", zone: "Indirecte", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 1 / Haut: 25%", action: "Fumer pendant 6-8 heures jusqu'à ce que la viande s'effiloche facilement." }] }], rest: { duration: 1800, action: "Laisser reposer 30 minutes avant d'effilocher." } },
               merguez: { name: "Merguez", type: 'agneau', duration: 420, targetTempBBQ: 200, targetTempInternal: 75, methods: [{ type: "grill", steps: [{ name: "Cuisson", zone: "Directe", grille: "Moyenne (Pos 2)", vents: "Bas: Pos 3 / Haut: 75%", action: "Griller en retournant régulièrement.", flippable: true }] }], rest: { duration: 0 } },
         },
         "Poisson / Crustacés": {
@@ -439,10 +495,81 @@
     // --- ÉTAT GLOBAL DE L'APPLICATION ---
     let appState = {};
     let historyStack = [];
-    let intervalId = null, stepTimeoutId = null;
+    let intervalId = null, stepTimeoutId = null, startAlarmTimeoutId = null;
+    let alarmLoop = null;
     let currentRecipe = null;
     let currentGeneratedPlan = null;
     const allPanelIds = ['saucesPanel', 'notebookPanel', 'referenceGuide'];
+
+    
+    function setBbqType(type) {
+        appState.bbqType = type;
+        showScreen('screen-cooking-mode');
+    }
+
+    function populateFuelOptions() {
+        const fuelSelect = document.getElementById('fuel-type-select');
+        const woodSelect = document.getElementById('fuel-wood-select');
+        const woodContainer = woodSelect.parentElement;
+        const rec = document.getElementById('fuel-recommendation');
+
+        if (!fuelSelect || !woodSelect || !woodContainer || !rec) return;
+        
+        fuelSelect.innerHTML = '';
+        woodSelect.innerHTML = '';
+
+        let recommended = fuelDB.general.default;
+        if (appState.selectedFoods && appState.selectedFoods.length > 0) {
+            const primaryFoodData = foodDB[appState.selectedFoods[0].category][appState.selectedFoods[0].key];
+            const foodType = primaryFoodData.type || 'default';
+            if (fuelDB.general[foodType]) {
+                recommended = fuelDB.general[foodType];
+            }
+        }
+
+        const bbqType = appState.bbqType || 'kettle';
+        const fuelOptions = [];
+        if (bbqType === 'gaz' || bbqType === 'plancha') {
+            fuelOptions.push('Gaz (propane/ butane)');
+            fuelOptions.push('Charbon en morceaux (pour touche fumée via box)');
+        } else if (bbqType === 'pellet') {
+            fuelOptions.push('Pellet (granulés)');
+            fuelOptions.push('Briquettes de charbon');
+        } else {
+            fuelOptions.push('Charbon en morceaux');
+            fuelOptions.push('Briquettes de charbon');
+        }
+
+        fuelOptions.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f;
+            opt.textContent = f;
+            fuelSelect.appendChild(opt);
+        });
+        
+        if (appState.bbqType === 'kettle') {
+            fuelSelect.value = 'Charbon en morceaux';
+        } else {
+            fuelSelect.value = recommended.fuel || fuelOptions[0];
+        }
+
+
+        if (appState.cookingMethod === 'smoke') {
+            woodContainer.style.display = 'block';
+            fuelDB.general.woodTypes.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w;
+                opt.textContent = w;
+                woodSelect.appendChild(opt);
+            });
+            woodSelect.value = recommended.wood || fuelDB.general.woodTypes[0];
+            rec.innerHTML = `<strong>Suggestion :</strong> ${recommended.fuel} + bois de fumage: ${recommended.wood}. ${recommended.notes || ''}`;
+        } else { // grill
+            woodContainer.style.display = 'none';
+            woodSelect.innerHTML = '<option value="Aucun">Aucun</option>';
+            rec.innerHTML = `<strong>Suggestion :</strong> ${recommended.fuel}. ${recommended.notes || ''}`;
+        }
+    }
 
     function resetAppState() {
         appState = {
@@ -463,11 +590,17 @@
         if (historyStack[historyStack.length - 1] !== screenId) {
             historyStack.push(screenId);
         }
+        if (screenId === 'screen-fuel') {
+            populateFuelOptions();
+        }
         window.scrollTo(0, 0);
     }
     
     function goBack() {
         if (historyStack.length > 1) {
+            if (historyStack[historyStack.length - 1] === 'screen-planning-summary') {
+                clearTimeout(startAlarmTimeoutId);
+            }
             historyStack.pop();
             const prevScreen = historyStack[historyStack.length - 1];
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -479,11 +612,12 @@
         resetAppState();
         appState.flow = flow;
         
-        await getWeather(); // Get weather at the beginning of any flow.
+        await getWeather(); 
 
         switch (flow) {
             case 'mealTime':
                 const now = new Date();
+                document.getElementById('mealDateInput').valueAsDate = now;
                 const defaultMealTime = new Date(now.getTime() + 4 * 3600 * 1000);
                 document.getElementById('mealTimeInput').value = `${String(defaultMealTime.getHours()).padStart(2,'0')}:${String(defaultMealTime.getMinutes()).padStart(2,'0')}`;
                 showScreen('screen-meal-time');
@@ -497,23 +631,30 @@
 
     function setMealTime() {
         const timeValue = document.getElementById('mealTimeInput').value;
-        if (!timeValue) { showAlert("Heure requise", "Veuillez choisir une heure."); return; }
+        const dateValue = document.getElementById('mealDateInput').value;
+        if (!timeValue || !dateValue) { showAlert("Date et heure requises", "Veuillez choisir une date et une heure."); return; }
+        
+        const [year, month, day] = dateValue.split('-');
         const [hours, minutes] = timeValue.split(':');
-        const mealTime = new Date();
-        mealTime.setHours(hours, minutes, 0, 0);
-        if (mealTime < new Date()) { mealTime.setDate(mealTime.getDate() + 1); }
+        
+        const mealTime = new Date(year, month - 1, day, hours, minutes);
+
+        if (mealTime < new Date()) { 
+            showAlert("Date invalide", "L'heure du repas ne peut pas être dans le passé.");
+            return;
+        }
         appState.mealTime = mealTime.toISOString();
         showScreen('screen-method');
     }
 
     function setCookingMethod(method) {
         appState.cookingMethod = method;
-        showScreen('screen-cooking-mode');
+        showScreen('screen-bbq-type');
     }
 
     function setCookingMode(mode) {
         appState.cookingMode = mode;
-        const maxSelection = mode === 'single' ? 1 : 2;
+        const maxSelection = mode === 'single' ? 1 : 3;
         setupFoodSelectionScreen(maxSelection);
         showScreen('screen-food-selection');
     }
@@ -523,7 +664,6 @@
         updateSelectedFoodsSummary();
         populateCategoryFilters();
         populateAllFoodItems(maxSelection);
-        // Set a default filter
         setTimeout(() => filterFoodList('Tous'), 0);
     }
 
@@ -555,6 +695,7 @@
             Object.entries(items).forEach(([key, item]) => {
                 if (item.methods && item.methods.some(m => m.type === appState.cookingMethod)) {
                     const weightInput = item.requiresWeight ? `<input type="number" step="0.1" min="0.5" class="w-24 border rounded p-1 text-center" placeholder="Poids (kg)" id="weight-${key}" onkeyup="event.stopPropagation()">` : '';
+                    const thicknessInput = item.requiresThickness ? `<input type="number" step="0.5" min="1" class="w-28 border rounded p-1 text-center" placeholder="Épaisseur (cm)" id="thickness-${key}" onkeyup="event.stopPropagation()">` : '';
                     
                     container.innerHTML += `
                         <div class="food-item-container flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100" data-name="${item.name.toLowerCase()}" data-category="${category}">
@@ -562,7 +703,8 @@
                                 <input type="checkbox" name="food" value="${category}:${key}" class="h-5 w-5 text-red-600 border-gray-300 rounded focus:ring-red-500" onchange="toggleFoodSelection(this, ${maxSelection})">
                                 <span>${item.name}</span>
                             </label>
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                ${thicknessInput}
                                 ${weightInput}
                                  <button onclick="event.stopPropagation(); triggerGetRecipes({ id: '${key}', itemName: '${item.name}', text: '' })" class="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200 font-semibold py-1 px-2 rounded-md">Recette</button>
                             </div>
@@ -576,7 +718,7 @@
         const [category, key] = checkbox.value.split(':');
         if (checkbox.checked) {
             if (appState.selectedFoods.length < maxSelection) {
-                appState.selectedFoods.push({ category, key, preparation: 'none' });
+                appState.selectedFoods.push({ category, key, preparations: [] });
             } else {
                 checkbox.checked = false;
                 showAlert('Sélection maximale atteinte', `Vous ne pouvez sélectionner que ${maxSelection} aliment(s).`);
@@ -602,7 +744,7 @@
     }
 
     function confirmFoodSelection() {
-        let allWeightsValid = true;
+        let allInputsValid = true;
         appState.selectedFoods.forEach(food => {
             const foodData = foodDB[food.category][food.key];
             if (foodData.requiresWeight) {
@@ -610,22 +752,50 @@
                 const weight = parseFloat(weightInput.value);
                 if (isNaN(weight) || weight <= 0) {
                     weightInput.classList.add('border-red-500');
-                    allWeightsValid = false;
+                    allInputsValid = false;
                 } else {
                     weightInput.classList.remove('border-red-500');
                     food.weight = weight;
                 }
             }
+            if (foodData.requiresThickness) {
+                const thicknessInput = document.getElementById(`thickness-${food.key}`);
+                const thickness = parseFloat(thicknessInput.value);
+                if (isNaN(thickness) || thickness <= 0) {
+                    thicknessInput.classList.add('border-red-500');
+                    allInputsValid = false;
+                } else {
+                    thicknessInput.classList.remove('border-red-500');
+                    food.thickness = thickness;
+                }
+            }
         });
 
-        if (!allWeightsValid) {
-            showAlert("Poids invalide", "Veuillez entrer un poids valide pour les aliments sélectionnés.");
+        if (!allInputsValid) {
+            showAlert("Données invalides", "Veuillez entrer des valeurs valides (poids/épaisseur) pour les aliments sélectionnés.");
             return;
         }
         populatePreparationScreen();
         showScreen('screen-preparation');
     }
     
+    function handlePreparationSelection(checkbox, foodIndex) {
+        const noneCheckbox = document.querySelector(`input[name="preparation-${foodIndex}"][value="none"]`);
+        const otherCheckboxes = document.querySelectorAll(`input[name="preparation-${foodIndex}"]:not([value="none"])`);
+
+        if (checkbox.value === 'none' && checkbox.checked) {
+            otherCheckboxes.forEach(cb => cb.checked = false);
+        } else if (checkbox.value !== 'none' && checkbox.checked) {
+            if (noneCheckbox) noneCheckbox.checked = false;
+        }
+        
+        const anyOtherChecked = Array.from(otherCheckboxes).some(cb => cb.checked);
+        if (!anyOtherChecked && noneCheckbox) {
+            noneCheckbox.checked = true;
+        }
+    }
+
+
     function populatePreparationScreen() {
         const container = document.getElementById('preparation-options-container');
         container.innerHTML = '';
@@ -633,30 +803,131 @@
         appState.selectedFoods.forEach((food, index) => {
             const foodData = foodDB[food.category][food.key];
             const foodName = foodData.name;
+            const allowed = foodData.allowed_preparations || ['none', 'rub', 'marinade', 'brine', 'injection', 'lacquer', 'sauce'];
+            
+            let options = '';
+            const allOptions = {
+                'none': 'Aucune', 'rub': 'Rub (sec)', 'marinade': 'Marinade',
+                'brine': 'Saumurage', 'injection': 'Injection', 'lacquer': 'Laquage / Glaze',
+                'sauce': 'Sauce (fini)'
+            };
+
+            allowed.forEach(prepKey => {
+                if (allOptions[prepKey]) {
+                    const isRecommended = foodData.recommended_preparations && foodData.recommended_preparations.includes(prepKey);
+                    const isSelectedByDefault = isRecommended || (prepKey === 'none' && (!foodData.recommended_preparations || foodData.recommended_preparations.length === 0));
+                    const checked = isSelectedByDefault ? 'checked' : '';
+                    const recommendationHTML = isRecommended ? '<span class="text-xs text-yellow-600 font-bold ml-2">⭐ Recommandé</span>' : '';
+                    options += `<label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 flex items-center"><input type="checkbox" onchange="handlePreparationSelection(this, ${index})" name="preparation-${index}" value="${prepKey}" ${checked} class="mr-2">${allOptions[prepKey]}${recommendationHTML}</label>`;
+                }
+            });
+
+            let donenessHTML = '';
+            if (foodData.doneness_options) {
+                donenessHTML += `<h4 class="font-semibold text-md mt-4">Choix de la cuisson :</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">`;
+                const donenessLevels = { 'bleu': 'Bleu', 'saignant': 'Saignant', 'a_point': 'À point'};
+                Object.keys(foodData.doneness_options).forEach((level) => {
+                    const checked = level === 'saignant' ? 'checked' : '';
+                    donenessHTML += `<label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100"><input type="radio" name="doneness-${index}" value="${level}" ${checked} class="mr-2">${donenessLevels[level]}</label>`;
+                });
+                donenessHTML += `</div>`;
+            }
+
+            let recommendationReasonHTML = '';
+            if (foodData.recommended_preparation_reason) {
+                recommendationReasonHTML = `
+                    <div class="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 text-sm rounded-r-lg">
+                        <strong>Conseil du chef :</strong> ${foodData.recommended_preparation_reason}
+                    </div>
+                `;
+            }
 
             const preparationsHTML = `
                 <div class="mt-4 border-t pt-4">
                     <h3 class="font-semibold text-lg">${foodName}</h3>
+                    <h4 class="font-semibold text-md mt-2">Type de préparation :</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                        <label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100"><input type="radio" name="preparation-${index}" value="none" checked class="mr-2">Aucune</label>
-                        <label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100"><input type="radio" name="preparation-${index}" value="rub" class="mr-2">Rub</label>
-                        <label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100"><input type="radio" name="preparation-${index}" value="marinade" class="mr-2">Marinade</label>
+                        ${options}
                     </div>
+                    ${recommendationReasonHTML}
+                    ${donenessHTML}
                 </div>
             `;
             container.innerHTML += preparationsHTML;
+             // Ensure initial state is correct after render
+            setTimeout(() => {
+                const noneCheckbox = document.querySelector(`input[name="preparation-${index}"][value="none"]`);
+                const otherCheckboxes = document.querySelectorAll(`input[name="preparation-${index}"]:not([value="none"])`);
+                const anyOtherChecked = Array.from(otherCheckboxes).some(cb => cb.checked);
+                if (anyOtherChecked && noneCheckbox) {
+                    noneCheckbox.checked = false;
+                }
+            }, 0);
         });
     }
 
     function setPreparation() {
         appState.selectedFoods.forEach((food, index) => {
-            const prepValue = document.querySelector(`input[name="preparation-${index}"]:checked`).value;
-            food.preparation = prepValue;
+            const prepInputs = document.querySelectorAll(`input[name="preparation-${index}"]:checked`);
+            food.preparations = Array.from(prepInputs).map(input => input.value);
+
+            const donenessInput = document.querySelector(`input[name="doneness-${index}"]:checked`);
+            if (donenessInput) {
+                food.doneness = donenessInput.value;
+            }
         });
-        showScreen('screen-fuel');
-        populateFuelScreen();
+        showAccessoryScreenOrContinue();
     }
     
+    function showAccessoryScreenOrContinue() {
+        const foodsWithAccessories = appState.selectedFoods.filter(f => foodDB[f.category][f.key].accessories);
+        if (foodsWithAccessories.length > 0) {
+            populateAccessoryScreen();
+            showScreen('screen-accessories');
+        } else {
+            showScreen('screen-fuel');
+        }
+    }
+
+    function populateAccessoryScreen() {
+        const container = document.getElementById('accessories-options-container');
+        container.innerHTML = '';
+
+        appState.selectedFoods.forEach((food, index) => {
+            const foodData = foodDB[food.category][food.key];
+            if (!foodData.accessories) return;
+
+            let optionsHTML = '';
+            foodData.accessories.forEach(acc => {
+                const isRecommended = acc.id === foodData.recommended_accessory;
+                const recommendationHTML = isRecommended ? '<span class="text-xs text-yellow-600 font-bold ml-2">⭐ Recommandé</span>' : '';
+                const checked = (foodData.requires_accessory === acc.id) || (!foodData.requires_accessory && acc.id === 'none') ? 'checked' : '';
+                optionsHTML += `<label class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 flex items-center"><input type="radio" name="accessory-${index}" value="${acc.id}" ${checked} class="mr-2">${acc.name}${recommendationHTML}</label>`;
+            });
+
+            const accessoryHTML = `
+                <div class="mt-4 border-t pt-4">
+                    <h3 class="font-semibold text-lg">${foodData.name}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        ${optionsHTML}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += accessoryHTML;
+        });
+    }
+    
+    function setAccessories() {
+        appState.selectedFoods.forEach((food, index) => {
+            const foodData = foodDB[food.category][food.key];
+            if (foodData.accessories) {
+                const accValue = document.querySelector(`input[name="accessory-${index}"]:checked`).value;
+                food.accessory = accValue;
+            }
+        });
+        showScreen('screen-fuel');
+    }
+
     function filterAndSearchFoods() {
         const searchTerm = document.getElementById('foodSearchInput').value.toLowerCase();
         const activeCategory = document.querySelector('.category-filter-btn.bg-blue-100')?.dataset.category || 'Tous';
@@ -677,38 +948,76 @@
         filterAndSearchFoods();
     }
 
-    function populateFuelScreen() {
-        const primaryFood = foodDB[appState.selectedFoods[0].category][appState.selectedFoods[0].key];
-        const primaryFoodType = primaryFood.type || 'default';
-        const recommendation = fuelDB.recommendations[primaryFoodType] || fuelDB.recommendations.default;
-        
-        appState.fuel.type = recommendation.fuel;
-        appState.fuel.wood = appState.cookingMethod === 'smoke' ? recommendation.wood : 'Aucun';
-
-        document.getElementById('fuel-recommendation').innerHTML = `<p class="font-bold">Recommandation pour ${primaryFoodType}:</p><p>${recommendation.fuel} + ${recommendation.wood}. ${recommendation.notes}</p>`;
-        
-        const fuelSelect = document.getElementById('fuel-type-select');
-        fuelSelect.innerHTML = fuelDB.general.fuelTypes.map(f => `<option value="${f}" ${f === appState.fuel.type ? 'selected' : ''}>${f}</option>`).join('');
-        
-        const woodSelect = document.getElementById('fuel-wood-select');
-        woodSelect.innerHTML = fuelDB.general.woodTypes.map(w => `<option value="${w}" ${w === appState.fuel.wood ? 'selected' : ''}>${w}</option>`).join('');
-        woodSelect.disabled = appState.cookingMethod !== 'smoke';
-    }
-
     function setFuelAndGeneratePlan() {
         appState.fuel.type = document.getElementById('fuel-type-select').value;
         appState.fuel.wood = document.getElementById('fuel-wood-select').value;
         generateCookingPlan();
+        showPrePrepScreenOrContinue();
+    }
+    
+    function showPrePrepScreenOrContinue() {
+        const prepsNeeded = [];
+        appState.selectedFoods.forEach(item => {
+            const food = foodDB[item.category][item.key];
+            if (item.preparations.some(p => ['injection', 'laquage', 'marinade', 'brine'].includes(p))) {
+                 prepsNeeded.push("Préparations (marinade, saumurage, etc.)");
+            }
+            if (food.spritz) {
+                prepsNeeded.push(`Liquide de vaporisation (${food.spritz.liquid})`);
+            }
+        });
+
+        const uniquePreps = [...new Set(prepsNeeded)];
+
+        if (uniquePreps.length > 0) {
+            populatePrePrepScreen(uniquePreps);
+            showScreen('screen-pre-prep');
+        } else {
+            displayPlanSummary();
+            showScreen('screen-planning-summary');
+        }
+    }
+
+    function populatePrePrepScreen(preps) {
+        const container = document.getElementById('pre-prep-list');
+        container.innerHTML = preps.map(prep => `
+            <div class="flex items-center">
+                <span class="text-green-500 mr-2">✔️</span>
+                <span>${prep}</span>
+            </div>
+        `).join('');
+    }
+
+    function confirmPrePrep() {
         displayPlanSummary();
         showScreen('screen-planning-summary');
     }
+
 
     // --- MOTEUR DE PLANIFICATION ---
     function generateCookingPlan() {
         let IGNITION_DURATION = 1200; // 20 min
         let PREHEAT_DURATION = 600; // 10 min
         let planSteps = [];
+        let preCookingInstructions = [];
         let totalDuration = 0;
+        
+        appState.selectedFoods.forEach(item => {
+            const food = foodDB[item.category][item.key];
+            if (item.preparations.includes('brine')) {
+                preCookingInstructions.push(`<strong>${food.name}:</strong> Effectuez le saumurage selon votre recette, généralement 8-12 heures avant le début de la cuisson.`);
+            }
+            if (item.preparations.includes('marinade')) {
+                preCookingInstructions.push(`<strong>${food.name}:</strong> Laissez la viande dans la marinade au moins 4 heures (ou une nuit) avant la cuisson.`);
+            }
+            if (item.preparations.includes('injection')) {
+                preCookingInstructions.push(`<strong>${food.name}:</strong> Préparez et injectez la viande 1 à 2 heures avant de la mettre sur le barbecue.`);
+            }
+            if (item.preparations.includes('rub')) {
+                preCookingInstructions.push(`<strong>${food.name}:</strong> Appliquez le rub juste avant de mettre la viande à cuire pour éviter qu'il ne déssèche la surface.`);
+            }
+        });
+
 
         if (appState.weather && appState.weather.temperature < 10) {
             PREHEAT_DURATION *= 1.5;
@@ -752,34 +1061,57 @@
             const food = foodDB[item.category][item.key];
             let cookDuration = 0;
             const method = food.methods.find(m => m.type === appState.cookingMethod);
+            const cookingStepsForThisFood = [];
             
+            let finalTargetTemp = food.targetTempInternal;
+            if (item.doneness && food.doneness_options && food.doneness_options[item.doneness]) {
+                finalTargetTemp = food.doneness_options[item.doneness];
+            }
+
             method.steps.forEach(originalStep => {
                 let duration = originalStep.duration;
-                if (!duration && food.requiresWeight && item.weight) {
+                if (food.requiresThickness && item.thickness && food.timePerCmSeconds) {
+                    duration = food.timePerCmSeconds * item.thickness;
+                } else if (food.requiresWeight && item.weight && food.timePerKgSeconds) {
                     duration = food.timePerKgSeconds * item.weight;
                 }
                 
-                let stepAction = originalStep.action;
-                if (item.preparation === 'marinade') {
-                    stepAction += "<br><small class='text-blue-500'>Note (Marinade): Un bac d'eau est conseillé pour maintenir l'humidité.</small>";
-                } else if (item.preparation === 'rub') {
-                    stepAction += "<br><small class='text-orange-500'>Note (Rub): Surveillez la coloration pour éviter de brûler le rub.</small>";
+                if (typeof duration !== 'number' || isNaN(duration)) {
+                    duration = 0;
                 }
 
-                if (originalStep.flippable && duration > 60) {
-                    const halfDuration = Math.round(duration / 2);
-                    planSteps.push({ ...originalStep, duration: halfDuration, title: `${food.name}: ${originalStep.name || 'Cuisson'} (côté 1)`, action: stepAction });
-                    planSteps.push({ ...originalStep, duration: halfDuration, title: `${food.name}: ${originalStep.name || 'Cuisson'} (côté 2)`, action: `<strong>Retournez la viande</strong> et continuez la cuisson.` });
-                    cookDuration += duration;
-                } else {
-                    planSteps.push({ ...originalStep, title: `${food.name}: ${originalStep.name || 'Cuisson'}`, duration, action: stepAction });
-                    cookDuration += duration;
+                let stepAction = originalStep.action;
+                if (item.accessory === 'rotisserie') {
+                    stepAction = "Installez le poulet sur la broche de la rôtissoire. Lancez la cuisson en indirect.";
                 }
+
+                if (food.spritz && !originalStep.isRest) {
+                    const intervalMinutes = Math.round(food.spritz.interval / 60);
+                    stepAction += `<br><strong class='text-blue-600'>Action Périodique : Vaporisez avec ${food.spritz.liquid} toutes les ${intervalMinutes} minutes.</strong>`;
+                }
+
+                const stepWithTemp = { ...originalStep, targetTempInternal: finalTargetTemp };
+
+                if (stepWithTemp.flippable && duration > 60) {
+                    const halfDuration = Math.round(duration / 2);
+                    cookingStepsForThisFood.push({ ...stepWithTemp, duration: halfDuration, title: `${food.name}: ${stepWithTemp.name || 'Cuisson'} (côté 1)`, action: stepAction });
+                    cookingStepsForThisFood.push({ ...stepWithTemp, duration: halfDuration, title: `${food.name}: ${stepWithTemp.name || 'Cuisson'} (côté 2)`, action: `<strong>Retournez la viande</strong> et continuez la cuisson.` });
+                } else {
+                    cookingStepsForThisFood.push({ ...stepWithTemp, title: `${food.name}: ${stepWithTemp.name || 'Cuisson'}`, duration, action: stepAction });
+                }
+                cookDuration += duration;
             });
+
+            if (item.preparations.includes('laquage') && cookingStepsForThisFood.length > 0) {
+                const lastStep = cookingStepsForThisFood[cookingStepsForThisFood.length - 1];
+                lastStep.action += "<br><strong class='text-red-600'>Action Finale : Appliquez votre laquage/glaze pendant les 15-20 dernières minutes de cette étape et répétez si nécessaire.</strong>";
+            }
+            
+            planSteps.push(...cookingStepsForThisFood);
             
             totalDuration += cookDuration;
             if (food.rest && food.rest.duration > 0) {
-                planSteps.push({ title: `Repos: ${food.name}`, duration: food.rest.duration, action: food.rest.action, isRest: true });
+                planSteps.push({ title: `Repos: ${food.name}`, duration: food.rest.duration, action: food.rest.action, isRest: true, targetTempInternal: finalTargetTemp });
                 totalDuration += food.rest.duration;
             }
 
@@ -812,13 +1144,15 @@
             step.endTime = new Date(cumulativeTime).toISOString();
         });
 
-        // Now that times are assigned, sort if needed (especially for multi-cook)
         planSteps.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
         
-        appState.plan = { startTime: startTime.toISOString(), endTime: endTime.toISOString(), totalDuration, steps: planSteps };
+        appState.plan = { startTime: startTime.toISOString(), endTime: endTime.toISOString(), totalDuration, steps: planSteps, preCookingInstructions };
     }
 
     function displayPlanSummary() {
+        clearTimeout(startAlarmTimeoutId); 
+        document.getElementById('calendar-btn').classList.add('hidden');
+
         const startTime = new Date(appState.plan.startTime);
         const endTime = new Date(appState.plan.endTime);
         const totalDuration = appState.plan.totalDuration;
@@ -847,6 +1181,30 @@
             weatherAlert.classList.add('hidden');
         }
 
+        const now = new Date();
+        const timeToStart = startTime.getTime() - now.getTime();
+        let alarmHTML = '';
+
+        if (appState.flow === 'mealTime' && timeToStart > 0) {
+            document.getElementById('calendar-btn').classList.remove('hidden');
+            alarmHTML = `<div class="mt-4 text-center text-sm text-blue-600">
+                <p>🔔 Une alarme est programmée pour vous notifier à <strong>${formatTime(startTime)}</strong>.</p>
+            </div>`;
+            startAlarmTimeoutId = setTimeout(() => {
+                playAlarm();
+                showAlert('🔥 C\'est l\'heure de commencer !', `Il est ${formatTime(startTime)}, temps de lancer la préparation de votre BBQ.`);
+            }, timeToStart);
+        }
+
+        let preCookingHTML = '';
+        if (appState.plan.preCookingInstructions && appState.plan.preCookingInstructions.length > 0) {
+            preCookingHTML = `
+                <h3 class="font-bold mt-6 text-xl text-blue-700">Préparations Préalables :</h3>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg space-y-2 text-sm">
+                    ${appState.plan.preCookingInstructions.map(instr => `<p>${instr}</p>`).join('')}
+                </div>
+            `;
+        }
 
         let summaryHTML = `
             <div class="bg-gray-100 p-4 rounded-lg text-center">
@@ -854,11 +1212,13 @@
                 <p>Repas prêt à : <strong class="text-2xl text-green-600">${formatTime(endTime)}</strong></p>
                 <p>Durée totale estimée : <strong>${Math.floor(totalDuration/3600)}h ${Math.round((totalDuration%3600)/60)}min</strong></p>
             </div>
+            ${alarmHTML}
+            ${preCookingHTML}
             <h3 class="font-bold mt-6 text-xl">Chronologie détaillée :</h3>
             <div class="border-l-2 border-gray-300 pl-4 space-y-4 mt-2">
         `;
         steps.forEach(step => {
-            const durationText = step.isManualValidation ? "Action manuelle" : `~${Math.round(step.duration / 60)} min`;
+            const durationText = step.isManualValidation ? "Action manuelle" : (step.duration ? `~${Math.round(step.duration / 60)} min` : '');
             summaryHTML += `<div><p class="font-semibold">${formatTime(new Date(step.startTime))} - ${step.title}</p><p class="text-sm text-gray-600 ml-2">(${durationText}) - ${step.action}</p></div>`;
         });
         summaryHTML += `</div>`;
@@ -877,9 +1237,9 @@
         document.getElementById('timeline-container').style.opacity = '0.5';
         document.getElementById('history-toggle').classList.add('hidden');
 
-        document.getElementById('currentStep').textContent = "En attente de démarrage";
+        document.getElementById('currentStep').textContent = appState.plan.steps[0]?.title || "EN ATTENTE";
         timerDisplay.textContent = "--:--";
-        updateCookingTiles(-1);
+        updateCookingTiles(0);
     }
     
     function beginPreparation() {
@@ -919,6 +1279,7 @@
     }
 
     function advanceToNextStep() {
+        stopAlarm();
         clearInterval(intervalId);
         clearTimeout(stepTimeoutId);
 
@@ -939,7 +1300,7 @@
         const currentStep = appState.plan.steps[newIndex];
         document.getElementById('currentStep').textContent = currentStep.title;
         
-        const durationInMs = currentStep.duration * 1000;
+        const durationInMs = (currentStep.duration || 0) * 1000;
         appState.cookingState.currentStepEndsAt = new Date(Date.now() + durationInMs).toISOString();
         
         updateTimelineUI(); 
@@ -1027,13 +1388,29 @@
 
     function playAlarm() {
         try {
+            if (alarmLoop) {
+                alarmLoop.stop();
+                alarmLoop.dispose();
+            }
             const synth = new Tone.Synth().toDestination();
-            const now = Tone.now();
-            synth.triggerAttackRelease("C5", "8n", now);
-            synth.triggerAttackRelease("G5", "8n", now + 0.2);
-            synth.triggerAttackRelease("C5", "8n", now + 0.4);
+            alarmLoop = new Tone.Loop(time => {
+                synth.triggerAttackRelease("C5", "8n", time);
+                synth.triggerAttackRelease("G5", "8n", time + 0.2);
+            }, "0.5s").start(0);
+            Tone.Transport.start();
         } catch(e) {
             console.warn("Could not play alarm sound.", e);
+        }
+    }
+    
+    function stopAlarm() {
+        if(alarmLoop) {
+            alarmLoop.stop();
+            alarmLoop.dispose();
+            alarmLoop = null;
+            if(Tone.Transport.state === 'started') {
+               Tone.Transport.stop();
+            }
         }
     }
 
@@ -1043,7 +1420,7 @@
         const ventsEl = document.getElementById('ventsTile');
         const grilleEl = document.getElementById('grilleTile');
 
-        if (index < 0 || index >= appState.plan.steps.length) {
+        if (index < 0 || !appState.plan || index >= appState.plan.steps.length) {
             bbqTempEl.textContent = '-';
             internalTempEl.textContent = '-';
             ventsEl.textContent = '-';
@@ -1051,26 +1428,18 @@
             return;
         }
 
-        let currentStep = appState.plan.steps[index];
+        const currentStep = appState.plan.steps[index];
         let associatedFood = null;
-
-        if (currentStep.isSetup) {
-            const firstFoodItem = appState.selectedFoods[0];
-            if (firstFoodItem) {
-                associatedFood = foodDB[firstFoodItem.category][firstFoodItem.key];
-            }
-        } else {
-            for (const foodItem of appState.selectedFoods) {
-                const foodData = foodDB[foodItem.category][foodItem.key];
-                if (currentStep.title.startsWith(foodData.name)) {
-                    associatedFood = foodData;
-                    break;
-                }
-            }
+        
+        const foodItem = appState.selectedFoods.find(f => currentStep.title.startsWith(foodDB[f.category][f.key].name));
+        if (foodItem) {
+            associatedFood = foodDB[foodItem.category][foodItem.key];
+        } else if(appState.selectedFoods.length > 0) {
+             associatedFood = foodDB[appState.selectedFoods[0].category][appState.selectedFoods[0].key];
         }
 
-        bbqTempEl.textContent = associatedFood ? `${associatedFood.targetTempBBQ}°C` : '-';
-        internalTempEl.textContent = associatedFood ? `${associatedFood.targetTempInternal}°C` : '-';
+        bbqTempEl.textContent = (currentStep.isSetup && associatedFood) ? `${associatedFood.targetTempBBQ}°C` : (associatedFood ? `${associatedFood.targetTempBBQ}°C` : '-');
+        internalTempEl.textContent = currentStep.targetTempInternal ? `${currentStep.targetTempInternal}°C` : (associatedFood ? `${associatedFood.targetTempInternal}°C` : '-');
         ventsEl.textContent = currentStep.vents || '-';
         grilleEl.textContent = currentStep.grille || '-';
     }
@@ -1231,7 +1600,7 @@
         }
         
         container.innerHTML = '<p class="text-center p-4">Chargement des recettes de base...</p>';
-        const prompt = `Agis comme un chef spécialisé en barbecue. Crée un guide de préparations. Retourne UNIQUEMENT un objet JSON valide. La structure doit avoir 3 clés principales: "Sauce", "Marinade", "RUB". Pour chaque clé, la valeur est un objet où chaque clé est un type de viande (ex: "Boeuf", "Porc", "Volaille", "Poisson"). La valeur pour chaque type de viande doit être un tableau d'au moins 2 objets recette. Chaque objet recette doit avoir "name", "ingredients" (tableau de strings), et "preparation" (string). Toutes les recettes doivent être sans gluten. Ne renvoie rien d'autre que l'objet JSON.`;
+        const prompt = `Agis comme un chef spécialisé en barbecue. Crée un guide de préparations. Retourne UNIQUEMENT un objet JSON valide. La structure doit avoir 6 clés principales: "Sauce", "Marinade", "RUB", "Laquage", "Injection", "Saumurage". Pour chaque clé, la valeur est un objet où chaque clé est un type de viande (ex: "Boeuf", "Porc", "Volaille", "Poisson"). La valeur pour chaque type de viande doit être un tableau d'au moins 2 objets recette. Chaque objet recette doit avoir "name", "ingredients" (tableau de strings), et "preparation" (string). Toutes les recettes doivent être sans gluten. Ne renvoie rien d'autre que l'objet JSON.`;
         try {
             const result = await callGemini(prompt, true);
             window.saucesDB = JSON.parse(result);
@@ -1251,6 +1620,9 @@
             <div class="list-item font-semibold" onclick="showMeatCategories('Sauce')">Sauces</div>
             <div class="list-item font-semibold" onclick="showMeatCategories('Marinade')">Marinades</div>
             <div class="list-item font-semibold" onclick="showMeatCategories('RUB')">RUBs (Épices sèches)</div>
+            <div class="list-item font-semibold" onclick="showMeatCategories('Laquage')">Laquages / Glazes</div>
+            <div class="list-item font-semibold" onclick="showMeatCategories('Injection')">Injections</div>
+            <div class="list-item font-semibold" onclick="showMeatCategories('Saumurage')">Saumurages</div>
         `;
     }
 
@@ -1292,11 +1664,13 @@
         const modalBox = document.getElementById('recipeModalBox');
         const title = document.getElementById('recipeModalTitle');
         const preferenceInput = document.getElementById('recipePreferenceInput');
+        const allergyInput = document.getElementById('recipeAllergyInput');
         const content = document.getElementById('recipeModalContent');
         const actions = document.getElementById('recipeModalActions');
 
         title.textContent = `Recette pour ${currentRecipe.itemName}`;
         preferenceInput.value = '';
+        allergyInput.value = '';
         content.innerHTML = '';
         actions.innerHTML = `<button onclick="getRecipes()" class="action-button bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Générer la recette</button>`;
         
@@ -1307,14 +1681,16 @@
     async function getRecipes() {
         const content = document.getElementById('recipeModalContent');
         const preference = document.getElementById('recipePreferenceInput').value;
+        const allergies = document.getElementById('recipeAllergyInput').value;
         content.innerHTML = '<p>Gemini réfléchit à une recette et à son plan de cuisson...</p>';
 
         const userPreference = preference ? `qui inclut spécifiquement la préférence suivante : "${preference}"` : '';
+        const userAllergies = allergies ? `La recette doit absolument éviter les allergènes suivants : "${allergies}"` : '';
         
-        const prompt = `Pour une recette de "${currentRecipe.itemName}" ${userPreference}, génère un objet JSON unique. Cet objet doit contenir deux clés: "displayText" et "cookingPlan".
+        const prompt = `Pour une recette de "${currentRecipe.itemName}" ${userPreference}, génère un objet JSON unique. ${userAllergies}. Cet objet doit contenir deux clés: "displayText" et "cookingPlan".
         1. "displayText": Une chaîne de caractères formatée en Markdown simple contenant une recette (titre, ingrédients, préparation).
         2. "cookingPlan": Un objet JSON structuré pour une app de BBQ avec les clés: "name" (string), "type" (string, ex: 'boeuf'), "rub_friendly": true, "duration" (number, secondes), "targetTempBBQ" (number, Celsius), "targetTempInternal" (number, Celsius), "methods" (tableau avec un objet: {type: 'grill' ou 'smoke', steps: [{name, duration, action, zone, grille, vents}]}), et "rest" ({duration}).
-        Toute la recette doit être sans gluten. Ne renvoie que l'objet JSON.`;
+        Toute la recette doit être sans gluten si le gluten est mentionné dans les allergies. Ne renvoie que l'objet JSON.`;
         try {
             const jsonString = await callGemini(prompt, true);
             const recipeData = JSON.parse(jsonString);
@@ -1323,7 +1699,6 @@
             currentGeneratedPlan = recipeData.cookingPlan;
 
             if (currentRecipe.id.toString().length < 10) currentRecipe.id = Date.now();
-            //saveToHistory(currentRecipe); // This was for individual recipes, now we save the full cook
             displayRecipe();
         } catch (error) { 
             console.error("Recipe generation error:", error);
@@ -1338,8 +1713,6 @@
         html = html.replace(/<li>(.*?)<br>/g, '<li>$1</li>').replace(/(<li>.*?<\/li>)/g, '<ul>$1</ul>').replace(/<\/ul><ul>/g, '');
         content.innerHTML = html;
         
-        // This favorite logic is for individual recipes, not full cooks. Can be simplified or removed if not needed.
-        // const isFavorite = getFavorites().some(fav => fav.id === currentRecipe.id); 
         actions.innerHTML = `
             <div>
                 <button onclick="getRecipes()" class="action-button bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg">Régénérer</button>
@@ -1365,7 +1738,6 @@
         appState.selectedFoods.push({ category: "Recettes Personnalisées", key: customKey });
         updateSelectedFoodsSummary();
 
-        // Check the newly added item
         setTimeout(() => {
             const newFoodInput = document.querySelector(`input[value="Recettes Personnalisées:${customKey}"]`);
             if (newFoodInput) {
@@ -1378,6 +1750,8 @@
     function resetApp() {
         clearInterval(intervalId); 
         clearTimeout(stepTimeoutId);
+        clearTimeout(startAlarmTimeoutId);
+        stopAlarm();
         localStorage.removeItem('activeBbqSession');
         resetAppState();
         document.getElementById('wizard').style.display = 'block';
@@ -1395,10 +1769,56 @@
     }
 
     function showAlert(title, message) { document.getElementById('alertModalTitle').textContent = title; document.getElementById('alertModalMessage').textContent = message; const modal = document.getElementById('alertModal'); const modalBox = document.getElementById('alertModalBox'); modal.classList.remove('hidden'); setTimeout(() => modalBox.classList.remove('scale-95', 'opacity-0'), 10); }
-    function closeAlertModal() { const modalBox = document.getElementById('alertModalBox'); modalBox.classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('alertModal').classList.add('hidden'), 200); }
+    function closeAlertModal() { stopAlarm(); const modalBox = document.getElementById('alertModalBox'); modalBox.classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('alertModal').classList.add('hidden'), 200); }
     function closeRecipeModal() { const modalBox = document.getElementById('recipeModalBox'); modalBox.classList.add('scale-95', 'opacity-0'); setTimeout(() => document.getElementById('recipeModal').classList.add('hidden'), 200); }
     
-    // --- NOUVELLES FONCTIONNALITÉS V2 ---
+    // --- NOUVELLES FONCTIONNALITÉS ---
+    function generateCalendarEvent() {
+        const plan = appState.plan;
+        if (!plan) return;
+
+        const planId = `bbqPlan_${new Date(plan.startTime).getTime()}`;
+        localStorage.setItem(planId, JSON.stringify(appState));
+        const resumeUrl = `${window.location.origin}${window.location.pathname}?planId=${planId}`;
+
+        const formatToUTC = (isoDate) => new Date(isoDate).toISOString().replace(/[-:]|\.\d{3}/g, '');
+        
+        const startDate = formatToUTC(plan.startTime);
+        const endDate = formatToUTC(plan.endTime);
+        const title = `BBQ: ${appState.selectedFoods.map(f => foodDB[f.category][f.key].name).join(' & ')}`;
+        
+        let description = `Plan de cuisson généré par l'Assistant BBQ Pro.\\n\\n`;
+        description += `Cliquez ici pour reprendre la session de cuisson : ${resumeUrl}\\n\\n`;
+        description += `Heure de début: ${new Date(plan.startTime).toLocaleString('fr-FR')}\\nHeure de fin: ${new Date(plan.endTime).toLocaleString('fr-FR')}\\n\\n`;
+        if(plan.preCookingInstructions.length > 0) {
+            description += `Préparations Préalables:\\n${plan.preCookingInstructions.join('\\n').replace(/<strong>|<\/strong>/g, '')}\\n\\n`;
+        }
+        description += `Étapes:\\n${plan.steps.map(s => `- ${s.title}: ${s.action.replace(/<br>|<strong.*?>|<\/strong>/g, ' ')}`).join('\\n')}`;
+
+        const icsContent = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Gemini BBQ Assistant//EN",
+            "BEGIN:VEVENT",
+            `UID:${Date.now()}@bbq.assistant`,
+            `DTSTAMP:${formatToUTC(new Date().toISOString())}`,
+            `DTSTART:${startDate}`,
+            `DTEND:${endDate}`,
+            `SUMMARY:${title}`,
+            `DESCRIPTION:${description.replace(/\n/g, '\\n')}`,
+            "END:VEVENT",
+            "END:VCALENDAR"
+        ].join('\r\n');
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'bbq-event.ics';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     async function getWeather() {
         if (!navigator.geolocation) {
             console.warn("Geolocation is not supported by your browser. Weather feature will be skipped.");
@@ -1449,6 +1869,28 @@
         localStorage.setItem('activeBbqSession', JSON.stringify(appState));
     }
 
+    function resumeSessionFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const planId = urlParams.get('planId');
+
+        if (planId) {
+            const savedPlan = localStorage.getItem(planId);
+            if (savedPlan) {
+                appState = JSON.parse(savedPlan);
+                
+                document.getElementById('passwordModal').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                displayPlanSummary();
+                showScreen('screen-planning-summary');
+
+                history.replaceState(null, '', window.location.pathname);
+                return true;
+            }
+        }
+        return false;
+    }
+
     function resumeSessionIfExists() {
         const savedSession = localStorage.getItem('activeBbqSession');
         if (savedSession) {
@@ -1456,7 +1898,7 @@
             
             if (appState.cookingState.currentStepIndex < 0 || !appState.plan || appState.cookingState.currentStepIndex >= appState.plan.steps.length) {
                 localStorage.removeItem('activeBbqSession');
-                return;
+                return false;
             }
 
             document.getElementById('wizard').style.display = 'none';
@@ -1468,15 +1910,13 @@
             displayWeatherInTimeline();
             
             if (appState.cookingState.currentStepIndex < 0) {
-                // Session was prepared but not started, show the start button
                 document.getElementById('start-cooking-prompt').classList.remove('hidden');
                 document.getElementById('timeline-container').style.opacity = '0.5';
                 document.getElementById('history-toggle').classList.add('hidden');
                 document.getElementById('currentStep').textContent = "En attente de démarrage";
                 timerDisplay.textContent = "--:--";
-                updateCookingTiles(-1);
+                updateCookingTiles(0);
             } else {
-                // Session was in progress, resume it
                 const currentIdx = appState.cookingState.currentStepIndex;
                 const currentStep = appState.plan.steps[currentIdx];
                 document.getElementById('currentStep').textContent = currentStep.title;
@@ -1485,7 +1925,9 @@
                 updateCookingTiles(currentIdx);
                 startStepTimer(currentIdx);
             }
+            return true;
         }
+        return false;
     }
 
     function showTroubleshootingModal() {
@@ -1599,8 +2041,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('passwordInput').focus();
         document.getElementById('passwordInput').addEventListener('keyup', (e) => e.key === "Enter" && checkPassword());
-        resetApp();
-        resumeSessionIfExists();
+        
+        const resumedFromUrl = resumeSessionFromURL();
+        if (!resumedFromUrl) {
+            const resumedFromStorage = resumeSessionIfExists();
+            if (!resumedFromStorage) {
+                resetApp();
+            }
+        }
     });
 
     </script>
