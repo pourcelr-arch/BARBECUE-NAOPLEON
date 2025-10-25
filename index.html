@@ -201,7 +201,7 @@
             <div id="wizard">
                 <div id="screen-home" class="screen active text-center">
                     <h2 class="wizard-title mb-8">Comment commencer ?</h2>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div class="choice-card hover-red" onclick="startFlow('mealTime')">
                             <i data-lucide="calendar-clock" class="w-16 h-16 mx-auto mb-4 text-fire-yellow"></i>
                             <h3 class="font-title text-2xl mb-2">🕒 Heure de Repas</h3>
@@ -216,6 +216,11 @@
                             <i data-lucide="check-circle-2" class="w-16 h-16 mx-auto mb-4 text-fire-yellow"></i>
                             <h3 class="font-title text-2xl mb-2">✅ BBQ déjà prêt</h3>
                             <p class="text-gray-400 text-sm">Obtenez des instructions pour ce qui est sur la grille.</p>
+                        </div>
+                        <div class="choice-card hover-blue" onclick="startWinterizingFlow()">
+                            <i data-lucide="snowflake" class="w-16 h-16 mx-auto mb-4 text-fire-yellow"></i>
+                            <h3 class="font-title text-2xl mb-2">❄️ Hivernage</h3>
+                            <p class="text-gray-400 text-sm">Nettoyer et préparer votre équipement.</p>
                         </div>
                     </div>
                 </div>
@@ -336,6 +341,29 @@
                 <div id="screen-allergy-explanation" class="screen"><h2 class="wizard-title mb-6">⚠️ Plan Adapté</h2><p class="text-gray-300 mb-4">Le plan a été modifié pour prendre en compte les allergies spécifiées :</p><div id="allergy-explanation-content" class="space-y-4 bg-yellow-900/50 p-4 rounded-lg text-yellow-200"></div><div class="flex justify-between mt-6"><button onclick="goBack()" class="nav-button">Retour</button><button onclick="showPrePrepScreenOrContinue()" class="action-button">Compris, Suivant</button></div></div>
                 <div id="screen-pre-prep" class="screen"><h2 class="wizard-title mb-6">Avant l'allumage</h2><p class="text-gray-300 mb-4">Pour un résultat optimal, réalisez ces préparations avant de démarrer le barbecue :</p><div id="pre-prep-list" class="space-y-4"></div><div class="flex justify-between mt-6"><button onclick="goBack()" class="nav-button">Retour</button><button onclick="confirmPrePrep()" class="action-button">Suivant</button></div></div>
                 <div id="screen-planning-summary" class="screen"><h2 class="wizard-title mb-6">📋 Votre Plan de Cuisson</h2><div id="allergy-alert" class="hidden my-4 p-4 rounded-lg"></div><div id="weather-alert" class="hidden my-4 p-4 rounded-lg"></div><div id="summary-content" class="space-y-4"></div><div class="flex justify-between items-center mt-6"><button onclick="goBack()" class="nav-button">Retour</button><div class="flex gap-4"><button onclick="generateCalendarEvent()" id="calendar-btn" class="action-button bg-steel-gray hidden">Calendrier</button><button onclick="startCooking()" class="action-button bg-green-600">Démarrer la Cuisson !</button></div></div></div>
+            
+                <!-- NOUVEAUX ÉCRANS POUR L'HIVERNAGE -->
+                <div id="screen-winter-selection" class="screen">
+                    <h2 class="wizard-title mb-8">❄️ Quel équipement hiverner ?</h2>
+                    <div id="winter-options-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                        <!-- Le contenu sera généré par JavaScript -->
+                    </div>
+                    <div class="flex justify-between mt-8">
+                        <button onclick="goBack()" class="nav-button">Retour</button>
+                    </div>
+                </div>
+
+                <div id="screen-winter-guide" class="screen">
+                    <h2 id="winter-guide-title" class="wizard-title mb-8">❄️ Guide d'Hivernage</h2>
+                    <div id="winter-guide-content" class="prose max-w-none text-gray-300">
+                        <!-- Le contenu sera généré par JavaScript -->
+                    </div>
+                    <div class="flex justify-between mt-8">
+                        <button onclick="goBack()" class="nav-button">Retour</button>
+                    </div>
+                </div>
+                <!-- FIN DES NOUVEAUX ÉCRANS -->
+
             </div>
             
              <!-- SECTION CUISSON ACTIVE -->
@@ -500,6 +528,9 @@
             document.getElementById('left-floating-buttons').classList.remove('hidden');
             document.getElementById('right-floating-buttons').classList.remove('hidden');
             
+            // NOUVEL AJOUT: Initialise le contexte audio de Tone.js
+            Tone.start();
+
             // Met à jour les icônes et le widget météo
             updateIcons();
             updateWeatherWidget();
@@ -517,12 +548,23 @@
     const bbqImageDB = {
         'kettle': { name: "Kettle", src: "https://media.istockphoto.com/id/2186821468/photo/black-kettle-barbecue-with-lid.jpg?s=612x612&w=0&k=20&c=4UPcG__6fRyAsmuWG785lPQ_bKwt6OApvjSjgH91GbE=" },
         'classic': { name: "Classique (Brique)", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/2ef9375d-dc42-5688-906a-3419de9e52ab/53dce404-5ffc-524c-b33f-194367ff8187.jpg" },
-        'gaz': { name: "À Gaz", src: "https://www.shutterstock.com/image-illustration/gas-bbq-grill-burner-3d-600nw-2594096417.jpg" },
-        'pellet': { name: "À Pellets", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/e01f7832-25fa-5d86-9407-0e50e454aced/f4e412d8-fe98-52f6-9d5a-9873c4f67be7.jpg" },
         'plancha': { name: "Plancha", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/188275f6-2071-5fb2-9b31-c2c282f637ea/5c93ff26-5ff5-5c7e-97bc-5e44e830acb1.jpg" },
         'kamado': { name: "Kamado", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/ca7e447d-0c97-5aa4-8601-f3a9d54f962d/9bc2dc80-201f-5659-872f-0fb53ae06c36.jpg" },
-        'offset': { name: "Offset Smoker", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/3723343d-615f-5cd0-b9eb-7e16b0ddc559/b1c719b9-f770-5c74-8e00-1f6edc42241c.jpg" }
+        'offset': { name: "Offset Smoker", src: "https://placehold.co/400x300/4B5563/F9FAFB?text=Offset" }, // URL invalide remplacée
+        'smoker_vertical': { name: "Smoker Vertical", src: "https://media.istockphoto.com/id/182774879/photo/meat-smoker.jpg?s=612x612&w=0&k=20&c=nY0XDOX7g6J9n5Mn3Tsge2ktHVu388Tr2t2SbgC-hng=" },
+        // Ajouts pour les types manquants
+        'gaz': { name: "BBQ à Gaz", src: "https://placehold.co/400x300/4B5563/F9FAFB?text=BBQ+Gaz" },
+        'pellet': { name: "BBQ à Pellets", src: "https://placehold.co/400x300/4B5563/F9FAFB?text=Pellets" }
     };
+    /* Suppression de smokerTypes car fusionné dans bbqImageDB
+    const smokerTypes = {
+        'weber': { name: "Weber Kettle", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/2b84a3c1-f2f2-53b7-99e2-63b72b38f804/79b4a1b0-f40e-56b0-96f3-311266b0a880.jpg" },
+        'plancha': { name: "Plancha", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/188275f6-2071-5fb2-9b31-c2c282f637ea/5c93ff26-5ff5-5c7e-97bc-5e44e830acb1.jpg" },
+        'kamado': { name: "Kamado", src: "https://d2u1z1lopyfwlx.cloudfront.net/thumbnails/ca7e447d-0c97-5aa4-8601-f3a9d54f962d/9bc2dc80-201f-5659-872f-0fb53ae06c36.jpg" },
+        'offset': { name: "Offset Mon Coeur", src: "http://googleusercontent.com/image_generation_content/0" },
+        'smoker_vertical': { name: "Smoker Vertical", src: "https://media.istockphoto.com/id/182774879/photo/meat-smoker.jpg?s=612x612&w=0&k=20&c=nY0XDOX7g6J9n5Mn3Tsge2ktHVu388Tr2t2SbgC-hng=" }
+    };
+    */
 
     const pitmasterDB = { 
         Sauce: { Universel: [{ name: "Sauce BBQ Kansas City Classique", descriptif: "Une sauce BBQ épaisse, sucrée et légèrement épicée, emblématique de Kansas City. Parfaite pour le porc et le poulet.", ingredients: ["500ml Ketchup", "150g Cassonade", "80ml Vinaigre de cidre", "60ml Mélasse", "2 c.à.s Poudre de chili", "1 c.à.s Poudre d'oignon", "1 c.à.s Poudre d'ail", "1 c.à.c Paprika fumé", "1/2 c.à.c Poivre de Cayenne"], preparation: [{ description: "Mélanger tous les ingrédients dans une casserole.", duration: 300 }, { description: "Porter à frémissement à feu moyen, puis réduire le feu et laisser mijoter 30 minutes en remuant de temps en temps jusqu'à ce que la sauce épaississe.", duration: 1800 }] }, { name: "Sauce Vinaigre de Caroline", descriptif: "Une sauce fine et acide à base de vinaigre, typique de la Caroline. Idéale pour 'mopper' (arroser) le porc effiloché.", ingredients: ["500ml Vinaigre de cidre", "80g Cassonade", "2 c.à.s Flocons de piment rouge", "1 c.à.s Sel", "1 c.à.s Poivre noir moulu"], preparation: [{ description: "Mélanger tous les ingrédients dans un bocal et secouer vigoureusement jusqu'à dissolution du sucre et du sel.", duration: 180 }, { description: "Laisser reposer au moins 4 heures.", duration: 14400 }] }, { name: "Mayonnaise Maison", descriptif: "La base de nombreuses sauces, onctueuse et savoureuse.", ingredients: ["1 jaune d'œuf extra-frais", "1 c.à.s de moutarde de Dijon", "250ml d'huile neutre (tournesol)", "1 filet de vinaigre ou de jus de citron", "Sel, poivre"], preparation: [{ description: "Dans un bol, fouetter le jaune d'œuf avec la moutarde, le sel et le poivre." }, { description: "Verser l'huile en un très mince filet tout en fouettant constamment jusqu'à ce que la mayonnaise monte." }, { description: "Quand toute l'huile est incorporée, ajouter le vinaigre ou le jus de citron pour ajuster l'assaisonnement." }] }, { name: "Ketchup Maison Fumé", descriptif: "Un ketchup maison avec une touche fumée, bien meilleur que celui du commerce.", ingredients: ["1 kg de tomates bien mûres", "1 oignon", "1 gousse d'ail", "100g de sucre roux", "100ml de vinaigre de cidre", "1 c.à.c de paprika fumé", "1/2 c.à.c de piment de Cayenne", "Sel, poivre"], preparation: [{ description: "Hacher grossièrement les tomates, l'oignon et l'ail. Mettre dans une casserole.", duration: 300 }, { description: "Ajouter le reste des ingrédients, porter à ébullition puis laisser mijoter à feu doux pendant 1 heure.", duration: 3600 }, { description: "Passer la préparation au mixeur plongeant jusqu'à l'obtention d'une consistance lisse. Laisser refroidir." }] }], Boeuf: [{ name: "Texas Mop Sauce", descriptif: "Une sauce d'arrosage (mop sauce) pour garder le brisket et autres grosses pièces de bœuf humides pendant le fumage.", ingredients: ["500ml Bière blonde", "250ml Bouillon de boeuf", "120ml Vinaigre de cidre", "1 oignon émincé", "2 gousses d'ail écrasées", "2 c.à.s Worcestershire", "1 c.à.s Poivre noir"], preparation: [{ description: "Combiner tous les ingrédients dans une casserole et laisser mijoter 20 minutes.", duration: 1200 }] }], Volaille: [{ name: "Sauce Blanche Alabama", descriptif: "Une sauce BBQ crémeuse et acidulée à base de mayonnaise, typique du nord de l'Alabama. Parfaite pour le poulet fumé ou grillé.", ingredients: ["250g de mayonnaise", "120ml de vinaigre de cidre", "1 c.à.s de jus de citron", "1 c.à.s de raifort préparé", "1 c.à.c de poivre noir moulu", "1/2 c.à.c de sel", "1/2 c.à.c de poivre de Cayenne"], preparation: [{ description: "Dans un bol, fouetter tous les ingrédients jusqu'à obtenir une consistance lisse." }, { description: "Couvrir et réfrigérer au moins 2 heures avant de servir.", duration: 7200 }] }, { name: "Sauce Buffalo pour Ailes de Poulet", descriptif: "La sauce piquante et beurrée classique pour des 'Buffalo wings' authentiques.", ingredients: ["120g de beurre doux", "120ml de sauce pimentée style Frank's RedHot", "1 c.à.s de vinaigre blanc", "1/4 c.à.c de sauce Worcestershire", "1/4 c.à.c de poudre d'ail"], preparation: [{ description: "Faire fondre le beurre dans une casserole à feu doux." }, { description: "Retirer du feu et incorporer le reste des ingrédients en fouettant. Servir chaud sur les ailes de poulet frites ou grillées." }] } ] }, 
@@ -533,8 +575,47 @@
         Saumurage: { Volaille: [{ name: "Saumure de base pour Volaille", descriptif: "Le saumurage est le secret pour une volaille (poulet, dinde) qui reste juteuse même après une longue cuisson.", ingredients: ["4L d'eau", "200g de sel casher", "150g de sucre", "Quelques grains de poivre noir", "2 feuilles de laurier", "1 tête d'ail coupée en deux"], preparation: [{ description: "Chauffer 1L d'eau avec le sel et le sucre pour les dissoudre." }, { description: "Retirer du feu, ajouter les aromates et les 3L d'eau restants pour refroidir." }, { description: "Immerger complètement la volaille dans la saumure froide pendant 8 à 12 heures.", duration: 28800 }] } ] } 
     };
     
-    const fuelDB = { bbqTypes: ['kettle', 'classic', 'gaz', 'pellet', 'plancha', 'kamado', 'offset'], smokeForms: ['chunks', 'copeaux', 'sciure', 'plank', 'aucun'], general: { fuelTypes: ['Charbon en morceaux', 'Briquettes de charbon', 'Gaz (propane/ butane)', 'Pellet (granulés)'], woodTypes: ['Aucun', 'Hickory', 'Pommier', 'Cerisier', 'Aulne', 'Chêne', 'Érable', 'Mesquite', 'Noyer', 'Vigne'], boeuf: { fuel: "Briquettes de charbon", wood: "Hickory", notes: "Idéal pour une fumée corcée et une chaleur stable sur la durée." }, porc: { fuel: "Briquettes de charbon", wood: "Pommier", notes: "Apporte une fumée douce et sucrée qui complète parfaitement le porc." }, volaille: { fuel: "Charbon en morceaux", wood: "Cerisier", notes: "Fournit une chaleur réactive et une fumée légère et fruitée." }, poisson: { fuel: "Charbon en morceaux", wood: "Aulne", notes: "Brûle proprement avec une chaleur douce, parfait pour la chair délicate du poisson." }, agneau: { fuel: "Briquettes de charbon", wood: "Hickory", notes: "Un bois de caractère qui se marie bien avec le goût prononcé de l'agneau." }, legume: { fuel: "Charbon en morceaux", wood: "Pommier", notes: "Chaleur modérée et fumée très légère pour ne pas masquer le goût." }, default: { fuel: "Briquettes de charbon", wood: "Pommier", notes: "Un choix polyvalent et fiable pour la plupart des cuissons." } } };
-
+    const fuelDB = { 
+        bbqTypes: ['kettle', 'classic', 'gaz', 'pellet', 'plancha', 'kamado', 'offset', 'smoker_vertical'], 
+        smokeForms: ['chunks', 'copeaux', 'sciure', 'plank', 'aucun'], 
+        general: { 
+            // DONNÉES MANQUANTES AJOUTÉES CI-DESSOUS
+            fuelTypes: ["Charbon de bois", "Briquettes", "Briquettes + Bois", "Gaz", "Pellets"],
+            woodTypes: ["Aucun", "Hêtre", "Chêne", "Pommier", "Cerisier", "Hickory", "Mesquite"],
+            
+            default: {
+                notes: "Pour la plupart des cuissons, le charbon de bois ou les briquettes sont parfaits. Le bois de hêtre est un bon choix universel.",
+                fuel: "Briquettes",
+                wood: "Hêtre"
+            },
+            boeuf: {
+                notes: "Le bœuf (surtout fumé) supporte des bois forts comme le chêne, le hickory ou le mesquite.",
+                fuel: "Briquettes + Bois",
+                wood: "Chêne"
+            },
+            porc: {
+                notes: "Le porc est excellent avec des bois fruitiers comme le pommier ou le cerisier.",
+                fuel: "Briquettes + Bois",
+                wood: "Pommier"
+            },
+            volaille: {
+                notes: "La volaille est délicate. Préférez des bois légers comme le pommier ou le cerisier.",
+                fuel: "Briquettes",
+                wood: "Pommier"
+            },
+            agneau: {
+                notes: "L'agneau se marie bien avec le chêne ou des bois fruitiers.",
+                fuel: "Charbon de bois",
+                wood: "Chêne"
+            },
+            poisson: {
+                notes: "Le poisson nécessite une fumée très légère, comme le hêtre ou le pommier.",
+                fuel: "Briquettes",
+                wood: "Hêtre"
+            }
+        } // <-- Accolade fermante manquante pour 'general'
+    }; // <-- Accolade fermante et point-virgule manquants pour 'fuelDB'
+    
     const foodDB = {
         _accessories: {
             kettle: ['rotisserie', 'pizza_stone', 'beer_can_holder', 'cloche'],
@@ -543,7 +624,8 @@
             pellet: ['pizza_stone'],
             plancha: [],
             kamado: ['rotisserie', 'pizza_stone', 'plancha_accessory', 'cloche'],
-            offset: []
+            offset: [],
+            smoker_vertical: ['cloche']
         },
         "Recettes Personnalisées": {},
         "Plats & Sandwichs": {
@@ -607,6 +689,100 @@
         }
     };
     
+    // NOUVELLE BASE DE DONNÉES POUR L'HIVERNAGE
+    const winterizingDB = {
+        'kettle_weber': {
+            name: "Kettle Style Weber (Grille Acier)",
+            steps: [
+                { title: "Vider les Cendres", description: "Videz complètement le récupérateur de cendres. Les cendres froides absorbent l'humidité et peuvent corroder la cuve." },
+                { title: "Nettoyage Profond (Grilles Acier)", description: "Brossez la grille de cuisson à chaud. Si très sale, vous pouvez utiliser un produit dégraissant (type savon noir) et rincez bien." },
+                { title: "Nettoyage (Cuve)", description: "Grattez les dépôts de graisse et de carbone à l'intérieur de la cuve et du couvercle avec une spatule en plastique (pas de métal !)." },
+                { title: "Lubrification (Grille Acier)", description: "Huilez légèrement la grille de cuisson avec une huile végétale (colza, tournesol) pour éviter la rouille de surface." },
+                { title: "Stockage", description: "Fermez toutes les aérations. Couvrez avec une housse de protection imperméable. Stockez si possible à l'abri (garage, cabanon)." }
+            ]
+        },
+        'kettle_napoleon': {
+            name: "Kettle Style Napoléon (Grille Fonte)",
+            steps: [
+                { title: "Vider les Cendres", description: "Videz complètement le récupérateur de cendres. Les cendres absorbent l'humidité et peuvent corroder la cuve." },
+                { title: "Nettoyage (Grille Fonte)", description: "Brossez la grille à chaud. N'UTILISEZ SURTOUT PAS DE SAVON (cela enlève le culottage). Si des résidus persistent, grattez doucement avec une spatule en bois ou en plastique." },
+                { title: "Nettoyage (Cuve)", description: "Grattez les dépôts de graisse et de carbone à l'intérieur de la cuve et du couvercle avec une spatule en plastique." },
+                { title: "CULOTTAGE (Grille Fonte)", description: "TRÈS IMPORTANT: Une fois la grille propre et sèche, appliquez une fine couche d'huile végétale (colza, lin) partout sur la fonte. Faites chauffer le BBQ 15-20 min pour 'fixer' l'huile et la protéger de la rouille." },
+                { title: "Stockage", description: "Fermez toutes les aérations. Couvrez avec une housse de protection imperméable. Stockez à l'abri." }
+            ]
+        },
+        'gaz': {
+            name: "À Gaz",
+            steps: [
+                { title: "Nettoyage à Chaud", description: "Allumez tous les brûleurs à fond pendant 15 min, couvercle fermé. Cela va carboniser les graisses (pyrolyse). Brossez les grilles." },
+                { title: "Nettoyage (Grilles & Bars)", description: "Une fois refroidi, retirez les grilles et les \"flavorizer bars\" (barres de protection). Lavez-les à l'eau chaude savonneuse. Séchez-les bien." },
+                { title: "Nettoyage (Intérieur)", description: "Grattez l'intérieur de la cuve et du couvercle. Videz le bac récupérateur de graisse." },
+                { title: "Vérification Brûleurs", description: "Assurez-vous que les trous des brûleurs ne sont pas obstrués (une araignée peut y faire un nid). Utilisez un petit fil de fer si besoin." },
+                { title: "Lubrification", description: "Huilez légèrement les grilles (en fonte surtout) et les flavorizer bars." },
+                { title: "Gaz", description: "Fermez la bouteille de gaz et déconnectez-la. Ne stockez jamais la bouteille de gaz à l'intérieur (garage, etc.)." },
+                { title: "Stockage", description: "Couvrez avec une housse de protection et stockez à l'abri." }
+            ]
+        },
+        'pellet': {
+            name: "À Pellets",
+            steps: [
+                { title: "VIDER LA TRÉMIE", description: "TRÈS IMPORTANT: Videz la trémie (réservoir à pellets). Les pellets absorbent l'humidité, gonflent et vont bloquer la vis sans fin." },
+                { title: "Nettoyage à Chaud", description: "Faites tourner le BBQ à haute température (200°C+) pendant 30 min pour brûler les graisses." },
+                { title: "Nettoyage (Intérieur)", description: "Aspirez les cendres froides du pot de combustion. Grattez et aspirez la cuve." },
+                { title: "Nettoyage (Grilles)", description: "Brossez les grilles. Huilez-les légèrement." },
+                { title: "Sonde de T°", description: "Nettoyez délicatement la sonde de température interne (RTD) avec un chiffon humide." },
+                { title: "Stockage", description: "Couvrez avec une housse de protection imperméable. Stockez à l'abri de la pluie." }
+            ]
+        },
+        'kamado': {
+            name: "Kamado",
+            steps: [
+                { title: "Nettoyage à Chaud (Pyrolyse)", description: "Faites une grosse flambée (300°C+) pendant 30-45 min. Cela va nettoyer la céramique intérieure et les grilles." },
+                { title: "Vider les Cendres", description: "Une fois totalement froid, videz les cendres. Utilisez un tisonnier pour dégager l'aération basse." },
+                { title: "Nettoyage (Extérieur)", description: "Nettoyez la céramique extérieure (émail) avec un chiffon humide." },
+                { title: "Vérification (Joint)", description: "Vérifiez l'état du joint (feutre) entre la cuve et le dôme. Ne le nettoyez pas avec des produits chimiques." },
+                { title: "Stockage", description: "Fermez les aérations. Couvrez avec une housse (assurez-vous qu'elle respire un peu pour éviter la condensation/moisissure)." }
+            ]
+        },
+        'offset': {
+            name: "Offset Smoker",
+            steps: [
+                { title: "Vider les Cendres", description: "Videz complètement la chambre de combustion (firebox) et la chambre de cuisson." },
+                { title: "Nettoyage (Grilles)", description: "Grattez les grilles à chaud si possible. Lavez-les si nécessaire." },
+                { title: "Nettoyage (Intérieur)", description: "Grattez les dépôts de graisse et de suie dans la chambre de cuisson et la cheminée." },
+                { title: "PRÉVENTION ROUILLE", description: "C'est l'ennemi n°1 des offsets (acier). Pulvérisez ou badigeonnez l'INTÉRIEUR de la chambre de cuisson et de la firebox avec de l'huile végétale. Faites chauffer légèrement pour 'culotter'." },
+                { title: "Stockage", description: "Couvrez avec une housse robuste et imperméable. Laissez l'aération de la cheminée légèrement ouverte pour la circulation d'air." }
+            ]
+        },
+        'smoker_vertical': {
+            name: "Smoker Vertical",
+            steps: [
+                { title: "Vider Cendres & Eau", description: "Videz le panier à charbon de ses cendres et le bac à eau." },
+                { title: "Nettoyage (Grilles & Bac)", description: "Lavez les grilles de cuisson et le bac à eau (souvent très gras) à l'eau chaude savonneuse." },
+                { title: "Nettoyage (Intérieur)", description: "Grattez les parois internes pour enlever les excès de suie." },
+                { title: "Lubrification", description: "Huilez légèrement les grilles." },
+                { title: "Stockage", description: "Stockez à l'abri. Si vous laissez dehors, couvrez avec une housse. Assurez-vous que le bac à eau est sec pour éviter la rouille." }
+            ]
+        },
+         'classic': {
+            name: "Classique (Brique)",
+            steps: [
+                { title: "Vider les Cendres", description: "Videz entièrement le foyer. Les cendres humides sont corrosives." },
+                { title: "Nettoyage (Grille)", description: "Brossez la grille vigoureusement. Si c'est une simple grille en acier, huilez-la pour éviter la rouille." },
+                { title: "Protection", description: "Si le BBQ n'a pas de toit, couvrez la zone de foyer (surtout la grille) avec une bâche ou une plaque de métal pour la protéger de la pluie et de la neige." }
+            ]
+        },
+        'plancha': {
+            name: "Plancha",
+            steps: [
+                { title: "Nettoyage à Chaud", description: "Pendant que la plaque est encore chaude, grattez les résidus avec une spatule. Versez un peu d'eau (ou vinaigre blanc) pour déglacer et continuez de gratter." },
+                { title: "Nettoyage à Froid", description: "Une fois refroidie, essuyez la plaque avec du papier absorbant." },
+                { title: "PRÉVENTION ROUILLE", description: "C'est l'étape la plus importante. Appliquez une fine couche d'huile végétale sur toute la surface de la plaque avec un chiffon pour la 'culotter' et la protéger de l'humidité." },
+                { title: "Stockage", description: "Fermez le couvercle ou couvrez la plaque. Stockez à l'abri." }
+            ]
+        }
+    };
+
     // ===================================================================================
     // --- SECTION 2: LOGIQUE DU WIZARD DE PLANIFICATION ---
     // ===================================================================================
@@ -728,13 +904,28 @@
      */
     function populateBbqOptions(method) {
         const container = document.getElementById('bbq-options-container');
-        let compatibleBbqTypes = fuelDB.bbqTypes;
+        let compatibleBbqTypes = []; // Initialiser en tableau vide
+
         if (method === 'smoke') {
-            compatibleBbqTypes = ['kettle', 'classic', 'pellet', 'kamado', 'offset'];
+            // Liste spécifique pour le FUMAGE
+            compatibleBbqTypes = ['kettle', 'gaz', 'pellet', 'kamado', 'offset', 'smoker_vertical'];
+        } else {
+            // Liste spécifique pour le GRILL (on ré-inclut l'offset, qui peut griller)
+            compatibleBbqTypes = ['kettle', 'classic', 'gaz', 'pellet', 'plancha', 'kamado', 'offset'];
         }
         
         container.innerHTML = compatibleBbqTypes.map(typeKey => {
             const bbq = bbqImageDB[typeKey];
+            // AJOUT: Vérification pour éviter l'erreur si bbq n'est pas trouvé
+            if (!bbq) {
+                console.warn(`Aucune image de BBQ trouvée pour la clé: ${typeKey}`);
+                return `
+                <div class="choice-card text-center p-2" onclick="selectBbqType('${typeKey}')">
+                    <img src="https://placehold.co/400x300/4B5563/F9FAFB?text=${typeKey}" alt="${typeKey}" class="w-full h-24 object-contain rounded-lg mb-2">
+                    <h4 class="font-title text-lg">${typeKey}</h4>
+                </div>
+                `;
+            }
             return `
                 <div class="choice-card text-center p-2" onclick="selectBbqType('${typeKey}')">
                     <img src="${bbq.src}" alt="${bbq.name}" class="w-full h-24 object-contain rounded-lg mb-2">
@@ -1104,8 +1295,8 @@
         const container = document.getElementById('accessories-options-container');
         let availableAccessories = new Map();
         
-        // Accessoires liés au BBQ
-        (foodDB._accessories[appState.bbqType] || []).forEach(accKey => {
+        // Accessoires liés au BBQ - SUPPRIMÉ
+        /* (foodDB._accessories[appState.bbqType] || []).forEach(accKey => {
             const acc = { id: accKey, name: accKey.replace('_', ' ') }; // Simplification, idéalement avoir une DB d'accessoires
              if (accKey === 'pizza_stone') acc.name = 'Pierre à Pizza';
              if (accKey === 'rotisserie') acc.name = 'Rôtissoire';
@@ -1115,6 +1306,7 @@
              if (accKey === 'smoker_box') acc.name = 'Boîte de Fumage';
             availableAccessories.set(accKey, acc);
         });
+        */
 
         // Accessoires liés aux aliments
         appState.selectedFoods.forEach(item => {
@@ -1251,6 +1443,70 @@
         displayPlanSummary();
         showScreen('screen-planning-summary');
     }
+
+    // NOUVELLES FONCTIONS POUR L'HIVERNAGE
+    /**
+     * Démarre le flux du guide d'hivernage.
+     */
+    function startWinterizingFlow() {
+        populateWinterizingOptions();
+        showScreen('screen-winter-selection');
+    }
+
+    /**
+     * Remplit les options de BBQ pour le guide d'hivernage.
+     */
+    function populateWinterizingOptions() {
+        const container = document.getElementById('winter-options-container');
+        // Itère sur la base de données d'hivernage (plus précis)
+        const allGuideTypes = Object.keys(winterizingDB); 
+        
+        container.innerHTML = allGuideTypes.map(guideKey => { // guideKey sera 'kettle_weber', 'kettle_napoleon', 'gaz', etc.
+            const guide = winterizingDB[guideKey];
+            
+            // Logique pour trouver la bonne image
+            let imageKey = guideKey;
+            if (guideKey === 'kettle_weber' || guideKey === 'kettle_napoleon') {
+                imageKey = 'kettle'; // Utilise l'image générique 'kettle' pour les deux
+            }
+            
+            const bbqImg = bbqImageDB[imageKey];
+            const imgSrc = bbqImg ? bbqImg.src : 'https://placehold.co/400x300/4B5563/F9FAFB?text=BBQ'; // Fallback
+            
+            return `
+                <div class="choice-card text-center p-2" onclick="showWinterizingGuide('${guideKey}')">
+                    <img src="${imgSrc}" alt="${guide.name}" class="w-full h-24 object-contain rounded-lg mb-2">
+                    <h4 class="font-title text-lg">${guide.name}</h4>
+                </div>
+            `;
+        }).join('');
+    }
+
+    /**
+     * Affiche le guide d'hivernage pour un BBQ spécifique.
+     * @param {string} bbqId - L'ID du BBQ (ex: 'kettle', 'gaz').
+     */
+    function showWinterizingGuide(bbqId) {
+        const guide = winterizingDB[bbqId];
+        if (!guide) {
+            showAlert("Erreur", "Aucun guide d'hivernage trouvé pour cet équipement.");
+            return;
+        }
+        
+        document.getElementById('winter-guide-title').textContent = `Hivernage: ${guide.name}`;
+        
+        const contentEl = document.getElementById('winter-guide-content');
+        contentEl.innerHTML = guide.steps.map((step, index) => {
+            return `
+                <h3 class="text-xl font-semibold text-fire-yellow mt-4">Étape ${index + 1}: ${step.title}</h3>
+                <p>${step.description}</p>
+            `;
+        }).join('');
+        
+        showScreen('screen-winter-guide');
+    }
+    // FIN DES NOUVELLES FONCTIONS D'HIVERNAGE
+
 
     function generateCookingPlan() {
         let IGNITION_DURATION = 1200;
@@ -1628,6 +1884,38 @@
         } catch(e) { console.warn("Could not play alarm sound.", e); }
     };
 
+    /**
+     * NOUVELLE FONCTION
+     * Joue des sons d'interface utilisateur pour le feedback vocal.
+     * @param {'start' | 'stop' | 'speak'} type - Le type de son à jouer.
+     */
+    async function playUISound(type) {
+        if (Tone.context.state !== 'running') {
+            await Tone.start();
+        }
+        
+        // Utiliser des synthés simples pour les bips
+        try {
+            if (type === 'start') {
+                // Bip aigu pour "écoute"
+                const synth = new Tone.Synth().toDestination();
+                synth.triggerAttackRelease("E5", "16n");
+            } else if (type === 'stop') {
+                // Bip plus grave pour "reçu"
+                const synth = new Tone.Synth().toDestination();
+                synth.triggerAttackRelease("C5", "16n");
+            } else if (type === 'speak') {
+                // Petit son de notification pour "parle"
+                const synth = new Tone.Synth().toDestination();
+                synth.volume.value = -6; // Un peu plus bas
+                synth.triggerAttackRelease("C5", "16n", "+0.0");
+                synth.triggerAttackRelease("G5", "16n", "+0.1");
+            }
+        } catch (e) {
+            console.error("Erreur Tone.js:", e);
+        }
+    }
+
     function stopAlarm() {
         if(alarmLoop) {
             alarmLoop.stop();
@@ -1885,6 +2173,13 @@
         
         const descriptifHTML = recipe.descriptif ? `<p class="text-sm text-gray-400 italic mt-1 mb-3">${recipe.descriptif}</p>` : '';
 
+        // NOUVEL AJOUT: Avertissement sur les allergènes pour les recettes fixes
+        const allergyWarningHTML = (prepType !== 'custom') ? `
+            <div class="bg-yellow-900/50 border-l-4 border-fire-yellow p-3 my-3 text-yellow-200 text-sm">
+                <strong>Attention :</strong> Ceci est une recette standard. Les ingrédients (comme la sauce soja, la sauce Worcestershire, etc.) peuvent contenir des allergènes (gluten, poisson, soja...).
+                <br>Pour une version garantie sans un allergène, veuillez utiliser la fonction "<strong>Générer une recette IA</strong>".
+            </div>` : '';
+
         let preparationHTML = '';
         const isGuidable = Array.isArray(recipe.preparation) && recipe.preparation.length > 0 && recipe.preparation.every(p => p.description);
 
@@ -1914,6 +2209,7 @@
                     <button onclick='toggleSauceFavorite(event)' class="text-2xl p-2">${isFavorite ? '❤️' : '🤍'}</button>
                 </div>
                 ${descriptifHTML}
+                ${allergyWarningHTML} <!-- Avertissement ajouté ici -->
                 <h4 class="font-semibold mt-2 mb-2">Ingrédients</h4>
                 <ul class="list-disc list-inside space-y-1">${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
                 ${preparationHTML}
@@ -1921,7 +2217,7 @@
             <div id="sauceStepView" class="hidden"></div>`;
     };
     
-    function toggleSauceFavorite(recipe, event) {
+    function toggleSauceFavorite(event) {
         event.stopPropagation();
         // MODIFICATION: Lire la recette depuis l'état
         const recipeFromState = saucesPanelState.recipe;
@@ -2355,8 +2651,22 @@
     // --- VOICE CONTROL (GEMINI LIVE STYLE) ---
     let recognition;
     let isVoiceControlActive = false;
+    let isWakeWordListening = false; // NOUVELLE VARIABLE D'ÉTAT
 
     function setupVoiceControl() {
+        // AJOUT: Vérification du contexte sécurisé (HTTPS)
+        const voiceBtn = document.getElementById('voice-btn'); // Cible le bouton
+        if (!window.isSecureContext) {
+            console.warn("Le contrôle vocal nécessite un contexte sécurisé (HTTPS ou localhost).");
+            // MODIFICATION: Griser le bouton au lieu de cacher l'UI
+            voiceBtn.disabled = true;
+            voiceBtn.style.backgroundColor = 'var(--steel-gray)';
+            voiceBtn.style.opacity = '0.5';
+            voiceBtn.style.cursor = 'not-allowed';
+            voiceBtn.setAttribute('title', "Le contrôle vocal est désactivé (nécessite HTTPS)");
+            return;
+        }
+        
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             document.getElementById('voice-control-ui').style.display = 'none';
@@ -2364,29 +2674,40 @@
         }
         recognition = new SpeechRecognition();
         recognition.lang = 'fr-FR';
-        recognition.continuous = true; // Keep listening
+        recognition.continuous = true; // MODIFICATION: Requis pour le hotword
         recognition.interimResults = true; // Get results as they come
 
         recognition.onstart = () => {
-            updateVoiceStatus('listening', '');
+            // MODIFICATION: Le statut dépend si on est en mode "live" ou "hotword"
+            if (isVoiceControlActive) {
+                updateVoiceStatus('listening', '');
+            }
         };
 
         recognition.onend = () => {
-            if (isVoiceControlActive) {
-                // If it stops but we want it to be active, restart it.
-                // This can happen after a period of silence.
-                try {
-                    recognition.start();
-                } catch(e) {
-                    console.error("Recognition restart failed", e);
-                    toggleVoiceControl(); // Turn it off if it fails to restart
+            // MODIFICATION: Redémarre UNIQUEMENT si on est en mode "hotword".
+            // Si on est en mode "live" (isVoiceControlActive), 
+            // c'est la fonction speakAndDisplay (utterance.onend) qui gère le redémarrage.
+            if (isWakeWordListening && !isVoiceControlActive) {
+                if (!document.hidden) { // Ne pas redémarrer si l'onglet est inactif
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.warn("Redémarrage de la reconnaissance échoué.", e);
+                    }
                 }
             }
         };
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error', event.error);
-            updateVoiceStatus('error', `Erreur: ${event.error}`);
+            // MODIFICATION: Gestion d'erreur plus claire
+            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                updateVoiceStatus('error', 'Permission micro refusée. Veuillez l\'activer dans votre navigateur.');
+                toggleVoiceControl(); // Désactiver l'interface
+            } else {
+                updateVoiceStatus('error', `Erreur: ${event.error}`);
+            }
         };
 
         recognition.onresult = (event) => {
@@ -2401,38 +2722,92 @@
                 }
             }
 
+            // Affiche toujours ce que l'utilisateur dit (pour le débogage)
             document.getElementById('interimTranscript').textContent = interim_transcript;
             
             if (final_transcript) {
-                document.getElementById('interimTranscript').textContent = '';
-                handleVoiceCommand(final_transcript.trim().toLowerCase());
+                const command = final_transcript.trim().toLowerCase();
+                
+                if (isVoiceControlActive) {
+                    // --- MODE "LIVE" (MODAL OUVERT) ---
+                    // On traite la commande
+                    playUISound('stop'); 
+                    document.getElementById('interimTranscript').textContent = '';
+                    handleVoiceCommand(command);
+
+                } else if (isWakeWordListening) {
+                    // --- MODE "HOTWORD" (ARMÉ, MODAL FERMÉ) ---
+                    // On cherche le mot-clé "pitmaster"
+                    if (command.includes("pitmaster")) {
+                        console.log("Wake word 'pitmaster' detected!");
+                        isWakeWordListening = false; // On quitte le mode hotword
+                        isVoiceControlActive = true;  // On active le mode "Live"
+                        
+                        playUISound('start'); // Son d'activation
+                        document.getElementById('voiceLiveModal').classList.remove('hidden');
+                        
+                        const voiceBtn = document.getElementById('voice-btn');
+                        voiceBtn.classList.remove('animate-pulse', 'bg-blue-600');
+                        voiceBtn.classList.add('bg-ember-red'); // Retour à la couleur "active"
+                        
+                        // Salutation
+                        speakAndDisplay("J'écoute.");
+                        
+                        // Vider le transcript pour ne pas traiter "pitmaster" comme une commande
+                        document.getElementById('interimTranscript').textContent = ''; 
+                    } else {
+                        // On a entendu quelque chose, mais ce n'est pas le hotword. On l'ignore.
+                        document.getElementById('interimTranscript').textContent = ''; // Vider pour l'utilisateur
+                    }
+                }
             }
         };
     };
 
     function toggleVoiceControl() {
         const modal = document.getElementById('voiceLiveModal');
-        isVoiceControlActive = !isVoiceControlActive;
-
-        if (isVoiceControlActive) {
-            modal.classList.remove('hidden');
+        const voiceBtn = document.getElementById('voice-btn');
+        
+        if (!isVoiceControlActive && !isWakeWordListening) {
+            // --- 1. ARMER LE HOTWORD (Premier clic) ---
+            isWakeWordListening = true;
+            isVoiceControlActive = false;
+            
+            // Indication visuelle : passe en bleu et pulse
+            voiceBtn.classList.add('animate-pulse', 'bg-blue-600'); 
+            voiceBtn.classList.remove('bg-ember-red');
+            
             try {
                 recognition.start();
+                console.log("Hotword listener armed.");
             } catch(e) {
                 console.error("Could not start voice recognition:", e);
-                isVoiceControlActive = false;
-                modal.classList.add('hidden');
+                isWakeWordListening = false;
+                voiceBtn.classList.remove('animate-pulse', 'bg-blue-600');
+                voiceBtn.classList.add('bg-ember-red');
             }
+            
         } else {
+            // --- 2. DÉSARMER / FERMER (Clic suivant) ---
+            isWakeWordListening = false;
+            isVoiceControlActive = false;
+            
+            // Réinitialise l'apparence du bouton
+            voiceBtn.classList.remove('animate-pulse', 'bg-blue-600');
+            voiceBtn.classList.add('bg-ember-red');
+            
+            // Ferme tout
             modal.classList.add('hidden');
             recognition.stop();
             speechSynthesis.cancel();
+            console.log("Voice control deactivated.");
         }
         updateIcons();
     };
 
     async function handleVoiceCommand(command) {
         updateVoiceStatus('thinking', `Commande reçue : "${command}"`);
+        recognition.stop(); // AJOUT: Arrêter l'écoute PENDANT la réflexion et la parole
 
         // App-specific commands
         if (command.includes("étape suivante") || command.includes("prochaine étape")) {
@@ -2456,7 +2831,7 @@
             return;
         }
          if (command.includes("quitte") || command.includes("ferme") || command.includes("stop")) {
-            toggleVoiceControl();
+            toggleVoiceControl(); // MODIFICATION: Appelle le toggle pour tout fermer
             return;
         }
 
@@ -2470,10 +2845,274 @@
             speakAndDisplay("Désolé, je n'ai pas pu traiter cette demande.");
         }
     };
+
+    /**
+     * NOUVELLE FONCTION (Cœur de l'IA conversationnelle)
+     * Analyse la réponse de l'utilisateur en fonction de l'écran actif et fait progresser le wizard.
+     * @param {string} command - La transcription vocale de l'utilisateur.
+     * @param {string} currentScreenId - L'ID de l'écran du wizard actuellement affiché.
+     * @returns {Promise<object>} Un objet contenant la réponse vocale de l'assistant.
+     */
+    async function parseAndProgress(command, currentScreenId) {
+        let response = "Désolé, je n'ai pas compris."; // Réponse par défaut
+        
+        // --- Étape 1: Parser la commande de l'utilisateur avec Gemini ---
+        const prompt = `
+            Tu es l'IA d'une application de BBQ. L'utilisateur est sur l'écran "${currentScreenId}".
+            Sa réponse vocale est : "${command}".
+            Date et heure actuelles (pour référence) : ${new Date().toISOString()}
+
+            Analyse sa réponse et retourne un objet JSON avec:
+            1. "intention": Ce que l'utilisateur veut faire (ex: "commencer_planification", "repondre_date", "repondre_methode", "repondre_type_bbq", "repondre_aliments", "naviguer_retour", "demande_generale").
+            2. "value": La valeur extraite (ex: une date ISO complète pour "repondre_date", "grill" pour "repondre_methode", "kettle" pour "repondre_type_bbq", un tableau de noms d'aliments comme ["poulet", "saucisses"] pour "repondre_aliments").
+            3. "followUpQuestion": Une question simple si Gemini a besoin de clarifier (ex: "Vous avez dit samedi, à quelle heure ?").
+            
+            Exemples :
+            - Si currentScreenId="screen-home" et command="je veux faire un barbecue samedi soir":
+              JSON: {"intention": "commencer_planification", "value": "2025-11-01T19:00:00", "followUpQuestion": null} (Note: L'année est 2025 si la date actuelle est proche)
+            - Si currentScreenId="screen-meal-time" et command="samedi à 19h":
+              JSON: {"intention": "repondre_date", "value": "2025-11-01T19:00:00", "followUpQuestion": null}
+            - Si currentScreenId="screen-method" et command="je veux griller":
+              JSON: {"intention": "repondre_methode", "value": "grill", "followUpQuestion": null}
+            - Si currentScreenId="screen-bbq-type" et command="j'ai un kettle":
+              JSON: {"intention": "repondre_type_bbq", "value": "kettle", "followUpQuestion": null}
+            - Si currentScreenId="screen-food-selection" et command="je veux du poulet et des saucisses":
+              JSON: {"intention": "repondre_aliments", "value": ["poulet", "saucisses"], "followUpQuestion": null}
+            - Si command="retour" ou "précédent":
+              JSON: {"intention": "naviguer_retour", "value": null, "followUpQuestion": null}
+            
+            Ne retourne que l'objet JSON.
+        `;
+        
+        let parsedAction = null;
+        try {
+            const jsonString = await callGemini(prompt, true);
+            parsedAction = JSON.parse(jsonString);
+        } catch(e) {
+            console.error("Erreur parsing NLU:", e);
+            return { response: "Désolé, une erreur est survenue lors de l'analyse." };
+        }
+
+        // --- Étape 2: Agir en fonction de l'intention ---
+        
+        if (parsedAction.followUpQuestion) {
+            return { response: parsedAction.followUpQuestion };
+        }
+
+        // Commande globale "Retour"
+        if (parsedAction.intention === 'naviguer_retour') {
+            goBack();
+            return { response: "Ok, retour à l'étape précédente." };
+        }
+
+        // Logique spécifique à l'écran
+        switch (currentScreenId) {
+            case 'screen-home':
+                if (parsedAction.intention === 'commencer_planification' && parsedAction.value) {
+                    startFlow('mealTime');
+                    // Tenter de pré-remplir la date si Gemini l'a fournie
+                    try {
+                        const mealTime = new Date(parsedAction.value);
+                        document.getElementById('mealTimeInput').value = parsedAction.value.substring(0, 16);
+                        setMealTime(); // Valide et passe à l'écran suivant
+                        response = `Parfait pour ${new Date(parsedAction.value).toLocaleString('fr-FR', {weekday: 'long', hour: '2-digit', minute: '2-digit'})}. Quelle technique ? Grill ou Fumage ?`;
+                    } catch (e) {
+                        response = "Parfait. Commençons. À quelle heure voulez-vous manger ?";
+                    }
+                } else if (parsedAction.intention === 'commencer_planification') {
+                     startFlow('mealTime');
+                     response = "Parfait. Commençons. À quelle heure voulez-vous manger ?";
+                } else if (parsedAction.intention.includes('hiverna')) {
+                    startWinterizingFlow();
+                    response = "Entendu. Quel équipement souhaitez-vous hiverner ?";
+                }
+                break;
+            
+            case 'screen-meal-time':
+                if (parsedAction.intention === 'repondre_date' && parsedAction.value) {
+                    try {
+                        const mealTime = new Date(parsedAction.value);
+                        if (mealTime <= new Date()) {
+                            response = "Cette date est dans le passé. Veuillez choisir une date future.";
+                        } else {
+                            document.getElementById('mealTimeInput').value = parsedAction.value.substring(0, 16); // format 'YYYY-MM-DDTHH:mm'
+                            setMealTime(); // Valide et passe à l'écran suivant
+                            response = "Noté. Quelle technique de cuisson ? Grill ou Fumage ?";
+                        }
+                    } catch (e) {
+                        response = "Je n'ai pas réussi à comprendre cette date. Pouvez-vous répéter ?";
+                    }
+                }
+                break;
+
+            case 'screen-method':
+                if (parsedAction.intention === 'repondre_methode' && (parsedAction.value === 'grill' || parsedAction.value === 'smoke')) {
+                    setCookingMethod(parsedAction.value);
+                    response = `Entendu pour ${parsedAction.value}. Quel équipement utilisez-vous ?`;
+                } else {
+                    response = "Veuillez choisir 'Grill' ou 'Fumage'.";
+                }
+                break;
+
+            case 'screen-bbq-type':
+                if (parsedAction.intention === 'repondre_type_bbq' && parsedAction.value) {
+                    const bbqKey = parsedAction.value.toLowerCase();
+                    // Vérifier si la clé existe dans la DB d'images (qui liste les types)
+                    if (bbqImageDB[bbqKey]) {
+                        selectBbqType(bbqKey);
+                        // Réponse dynamique basée sur l'étape suivante
+                        if (bbqKey === 'kettle') {
+                            response = "OK. Style Weber ou Napoléon ?";
+                        } else if (bbqKey === 'gaz') {
+                            response = "Compris. Combien de brûleurs ?";
+                        } else {
+                            response = "OK. Cuisson simple ou multiple ?";
+                        }
+                    } else {
+                        response = `Je ne connais pas le type "${parsedAction.value}". Veuillez choisir parmi les options.`;
+                    }
+                }
+                break;
+            
+            case 'screen-kettle-style':
+                 if (parsedAction.value === 'weber' || parsedAction.value === 'napoleon') {
+                    setKettleType(parsedAction.value);
+                    response = "Ok. Cuisson simple ou multiple ?";
+                 }
+                 break;
+            
+            case 'screen-burner-count':
+                 if (parsedAction.value === 2 || parsedAction.value === 3 || parsedAction.value === 4) {
+                    setBurnerCount(parsedAction.value);
+                    response = "Noté. Cuisson simple ou multiple ?";
+                 }
+                 break;
+            
+            case 'screen-cooking-mode':
+                if (parsedAction.value === 'single' || parsedAction.value === 'multiple') {
+                    setCookingMode(parsedAction.value);
+                    response = "D'accord. Que cuisinez-vous ?";
+                }
+                break;
+
+            case 'screen-food-selection':
+                if (parsedAction.intention === 'repondre_aliments' && parsedAction.value && parsedAction.value.length > 0) {
+                    // Recherche des aliments mentionnés
+                    let foundFoods = [];
+                    parsedAction.value.forEach(foodName => {
+                        const name = foodName.toLowerCase().replace('saucisse', 'saucisse'); // normalisation
+                        let found = false;
+                        Object.keys(foodDB).forEach(category => {
+                            Object.keys(foodDB[category]).forEach(key => {
+                                if (!found && foodDB[category][key].name.toLowerCase().includes(name)) {
+                                    const foodId = `${category}:${key}`;
+                                    const inputElement = document.getElementById(`food-${foodId}`);
+                                    if (inputElement) {
+                                        inputElement.checked = true;
+                                        toggleFoodSelection(inputElement, appState.cookingMode === 'single' ? 1 : 3);
+                                        foundFoods.push(foodDB[category][key].name);
+                                        found = true;
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    
+                    if (foundFoods.length > 0) {
+                        // Si c'est en mode 'single', on continue dès le premier aliment trouvé
+                        if (appState.cookingMode === 'single') {
+                            confirmFoodSelection();
+                            response = `Ok pour ${foundFoods[0]}. Passons à la préparation.`;
+                        } else {
+                            response = `J'ai ajouté : ${foundFoods.join(', ')}. Autre chose ?`;
+                        }
+                    } else {
+                        response = `Je n'ai pas trouvé "${command}" dans ma liste.`;
+                    }
+                } else if (command.includes("suivant") || command.includes("confirme")) {
+                    confirmFoodSelection();
+                    response = "Sélection confirmée. Passons à la préparation.";
+                }
+                break;
+
+            // ... AJOUTER LES AUTRES ÉCRANS (preparation, accessories, fuel...) ...
+
+            default:
+                // Si on est sur un écran non géré ou si l'intention n'est pas claire
+                const fallbackPrompt = `L'utilisateur dit "${command}". Réponds-lui de manière concise en tant qu'assistant BBQ.`;
+                response = await callGemini(fallbackPrompt);
+        }
+
+        return { response };
+    }
+    
+    async function handleVoiceCommand(command) {
+        updateVoiceStatus('thinking', `Commande reçue : "${command}"`);
+        recognition.stop(); // Arrêter l'écoute PENDANT la réflexion et la parole
+
+        let actionResponse = "Désolé, je n'ai pas compris.";
+
+        try {
+            // --- 1. Gérer les commandes "globales" ---
+            if (command.includes("quitte") || command.includes("ferme") || command.includes("stop")) {
+                toggleVoiceControl(); // Ferme le modal et désactive tout
+                return;
+            }
+            if (command.includes("répète") || command.includes("répéter")) {
+                const currentStepText = document.getElementById('currentStep').textContent;
+                const currentStepData = appState.plan.steps[appState.cookingState.currentStepIndex];
+                if (currentStepData) {
+                    actionResponse = `Étape en cours: ${currentStepText}. L'action est: ${currentStepData.action.replace(/<[^>]*>/g, '')}`;
+                } else {
+                    actionResponse = "Aucune cuisson en cours.";
+                }
+                speakAndDisplay(actionResponse);
+                return;
+            }
+
+            // --- 2. Déterminer le contexte (Wizard ou Cuisson) ---
+            const activeScreenEl = document.querySelector('#wizard .screen.active');
+            const currentScreenId = activeScreenEl ? activeScreenEl.id : null;
+
+            if (currentScreenId) {
+                // --- 3a. CONTEXTE: WIZARD ---
+                // On est DANS le wizard, on utilise le nouveau parser conversationnel
+                const action = await parseAndProgress(command, currentScreenId);
+                actionResponse = action.response;
+
+            } else if (document.getElementById('cooking-timeline-section').classList.contains('hidden') === false) {
+                // --- 3b. CONTEXTE: CUISSON EN COURS ---
+                // Logique réactive simple
+                if (command.includes("étape suivante") || command.includes("prochaine étape") || command.includes("valide")) {
+                    advanceToNextStep();
+                    actionResponse = "Ok, passage à l'étape suivante.";
+                } else if (command.includes("temps restant")) {
+                    const timerText = document.getElementById('timerDisplay').textContent;
+                    actionResponse = `Il reste ${timerText} à l'étape actuelle.`;
+                } else {
+                    const fallbackPrompt = `L'utilisateur est en train de cuire son BBQ et dit : "${command}". Réponds-lui de manière concise.`;
+                    actionResponse = await callGemini(fallbackPrompt);
+                }
+            } else {
+                // --- 3c. CONTEXTE INCONNU (Normalement impossible) ---
+                 actionResponse = "Je ne suis pas sûr de savoir comment aider avec cela pour le moment.";
+            }
+        
+        } catch (e) {
+            console.error("Erreur dans handleVoiceCommand:", e);
+            actionResponse = "Désolé, une erreur interne est survenue.";
+        }
+        
+        // --- 4. Répondre et redémarrer l'écoute ---
+        speakAndDisplay(actionResponse); 
+    };
     
     function speakAndDisplay(text) {
         document.getElementById('assistantResponse').textContent = text;
         speechSynthesis.cancel();
+        
+        playUISound('speak'); // AJOUT: Son "L'assistant parle"
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'fr-FR';
         
@@ -2482,9 +3121,18 @@
         };
         
         utterance.onend = () => {
-            // After speaking, clear the response and go back to listening
-            updateVoiceStatus('listening', '');
+            // MODIFICATION: Redémarrer l'écoute APRES avoir parlé
             document.getElementById('assistantResponse').textContent = '';
+            if (isVoiceControlActive) { // On ne redémarre l'écoute que si le modal est censé être ouvert
+                try {
+                    recognition.start();
+                } catch(e) {
+                    console.warn("Redémarrage de la reconnaissance après la parole échoué.", e);
+                }
+            } else {
+                 // Si le modal a été fermé (ex: par "stop"), ne pas redémarrer.
+                 updateVoiceStatus('listening', ''); // Réinitialise l'UI au cas où
+            }
         };
         
         speechSynthesis.speak(utterance);
@@ -2746,24 +3394,6 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
